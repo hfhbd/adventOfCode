@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    env:
+      GRADLE_OPTS: -Dorg.gradle.caching=true
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gradle/gradle-build-action@v2
+        with:
+          dependency-graph: generate-and-submit
+          gradle-home-cache-cleanup: true
+      - name: Build with Gradle
+        run: ./gradlew build
