@@ -2,6 +2,9 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class Day3Test {
+    @Test fun a() {
+        getDigits("")
+    }
     @Test
     fun partOneSample() {
         val input =
