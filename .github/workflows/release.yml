@@ -13,8 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pages: write
-      id-token: write
       packages: write
 
     env:
@@ -28,7 +26,6 @@ jobs:
       - name: Set environment for version
         run: long="${{ github.ref }}"; version=${long#"refs/tags/v"}; echo "version=${version}" >> $GITHUB_ENV
       - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v4
       - uses: gradle/actions/setup-gradle@v3
 
       - name: Release maven artifacts
@@ -36,12 +33,5 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_GitHubPackagesUsername: ${{ github.actor }}
           ORG_GRADLE_PROJECT_GitHubPackagesPassword: ${{ github.token }}
-
-      - name: Create docs
-        run: ./gradlew dokkaHtmlMultiModule --no-configuration-cache
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: build/dokka/htmlMultiModule
-      - name: Deploy Documentation to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
