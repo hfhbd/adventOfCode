@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm")
     id("maven-publish")
+    id("signing")
 }
 
 kotlin.jvmToolchain(8)
@@ -19,4 +20,23 @@ publishing {
     publications.register<MavenPublication>("gpr") {
         from(components["java"])
     }
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+signing {
+    val signingKey: String? = project.properties["signingKey"] as String?
+    val signingPassword: String? = project.properties["signingPassword"] as String?
+    if (signingKey != null) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign(publishing.publications)
+    }
+}
+
+tasks.withType<AbstractArchiveTask>().configureEach {
+    isPreserveFileTimestamps = false
+    isReproducibleFileOrder = true
 }
