@@ -28,10 +28,9 @@ java {
 }
 
 signing {
-    val signingKey = project.providers.gradleProperty("signingKey")
-    val signingPassword = project.providers.gradleProperty("signingPassword")
+    val signingKey = providers.gradleProperty("signingKey")
     if (signingKey.isPresent) {
-        useInMemoryPgpKeys(signingKey.get(), signingPassword.get())
+        useInMemoryPgpKeys(signingKey.get(), providers.gradleProperty("signingPassword").get())
         sign(publishing.publications)
     }
 }
