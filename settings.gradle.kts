@@ -23,7 +23,7 @@ gradleEnterprise {
     }
 }
 
-rootProject.name = "advendOfCode"
+rootProject.name = "adventOfCode"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
