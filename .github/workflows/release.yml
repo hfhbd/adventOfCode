@@ -2,7 +2,7 @@ name: Release
 
 on:
   release:
-    types:  [ created ]
+    types: [ created ]
 
 concurrency:
   group: release
@@ -22,6 +22,10 @@ jobs:
       - name: Set environment for version
         run: long="${{ github.ref }}"; version=${long#"refs/tags/v"}; echo "version=${version}" >> $GITHUB_ENV
       - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'adopt'
+          java-version: 21
       - uses: gradle/actions/setup-gradle@v3
 
       - name: Release maven artifacts
