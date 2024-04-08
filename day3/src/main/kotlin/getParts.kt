@@ -2,6 +2,8 @@ fun getParts(input: String) = sequence {
     val lines = input.lines()
     for ((lineNumber, line) in lines.withIndex()) {
 
+
+        
         var currentIndex = 0
 
         while (true) {
