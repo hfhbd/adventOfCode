@@ -31,9 +31,6 @@ jobs:
           cache-encryption-key: ${{ secrets.CC }}
       - name: Build with Gradle
         run: ./gradlew build
-      - uses: actions/upload-artifact@v4
-        with:
-          path: build/reports/configuration-cache
     
   test:
     runs-on: macos-14
@@ -59,6 +56,3 @@ jobs:
           cache-encryption-key: ${{ secrets.CC }}
       - name: Build with Gradle
         run: ./gradlew build
-      - uses: actions/upload-artifact@v4
-        with:
-          path: build/reports/configuration-cache
