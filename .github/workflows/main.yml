@@ -32,6 +32,7 @@ jobs:
           gradle-home-cache-cleanup: true
           cache-encryption-key: ${{ secrets.CC }}
           dependency-graph: generate-and-submit
+          additonal-arguments: --no-configuration-cache -Dorg.gradle.unsafe.isolated-projects=false
       - name: Build with Gradle
         run: ./gradlew build
 
