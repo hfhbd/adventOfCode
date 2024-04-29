@@ -31,6 +31,5 @@ jobs:
           validate-wrappers: true
           gradle-home-cache-cleanup: true
           cache-encryption-key: ${{ secrets.CC }}
-          dependency-graph: generate-and-submit
       - name: Build with Gradle
         run: ./gradlew build
