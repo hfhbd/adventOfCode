@@ -26,4 +26,3 @@ jobs:
           cache-encryption-key: ${{ secrets.CC }}
 
       - uses: actions/dependency-review-action@v4
-        if: github.event_name == 'pull_request'
