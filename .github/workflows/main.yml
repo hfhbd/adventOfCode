@@ -9,18 +9,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     env:
       GRADLE_OPTS: -Dorg.gradle.caching=true
 
     steps:
       - uses: actions/checkout@v4
-      - run: printenv
       - uses: actions/setup-java@v4
         with:
           distribution: 'adopt'
           java-version: 21
-      - run: cat ~/.m2/toolchains.xml
       - name: Cache build logic
         uses: actions/cache@v4
         with:
@@ -28,35 +28,8 @@ jobs:
           key: build-logic-${{ hashFiles('gradle/build-logic/src/**', 'gradle/build-logic/build.gradle.kts','gradle/build-logic/settings.gradle.kts') }}
       - uses: gradle/actions/setup-gradle@v3
         with:
+          validate-wrappers: true
           gradle-home-cache-cleanup: true
           cache-encryption-key: ${{ secrets.CC }}
-      - run: cat ~/.m2/toolchains.xml
-      - name: Build with Gradle
-        run: ./gradlew build
-    
-  test:
-    runs-on: macos-14
-    needs: build
-    env:
-      GRADLE_OPTS: -Dorg.gradle.caching=true
-  
-    steps:
-      - uses: actions/checkout@v4
-      - run: printenv
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'adopt'
-          java-version: 21
-      - run: cat ~/.m2/toolchains.xml
-      - name: Cache build logic
-        uses: actions/cache@v4
-        with:
-          path: gradle/build-logic/build
-          key: build-logic-${{ hashFiles('gradle/build-logic/src/**', 'gradle/build-logic/build.gradle.kts','gradle/build-logic/settings.gradle.kts') }}
-      - uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-home-cache-cleanup: true
-          cache-encryption-key: ${{ secrets.CC }}
-      - run: cat ~/.m2/toolchains.xml
       - name: Build with Gradle
         run: ./gradlew build
