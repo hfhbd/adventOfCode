@@ -25,10 +25,5 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.CC }}
 
-  dependency-review:
-    runs-on: ubuntu-latest
-    needs: dependency-submission
-    if: github.event_name == 'pull_request'
-
-    steps:
       - uses: actions/dependency-review-action@v4
+        if: github.event_name == 'pull_request'
