@@ -12,7 +12,7 @@ dependencies {
 
 publishing {
     repositories {
-        maven(url = "https://maven.pkg.github.com/hfhbd/advendOfCode") {
+        maven(url = "https://maven.pkg.github.com/hfhbd/adventOfCode") {
             name = "GitHubPackages"
             credentials(PasswordCredentials::class)
         }
