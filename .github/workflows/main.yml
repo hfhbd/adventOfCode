@@ -20,10 +20,8 @@ jobs:
         with:
           path: gradle/build-logic/build
           key: build-logic-${{ hashFiles('gradle/build-logic/src/**', 'gradle/build-logic/build.gradle.kts','gradle/build-logic/settings.gradle.kts') }}
-      - uses: gradle/actions/setup-gradle@v3
+      - uses: gradle/actions/setup-gradle@v4
         with:
-          validate-wrappers: true
-          gradle-home-cache-cleanup: true
           cache-encryption-key: ${{ secrets.CC }}
       - name: Build with Gradle
         run: ./gradlew build
