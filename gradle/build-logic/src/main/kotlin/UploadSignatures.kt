@@ -1,6 +1,9 @@
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
@@ -35,6 +38,15 @@ abstract class UploadSignatures : DefaultTask() {
                 url.takeFrom(githubApiUrl.get())
                 accept(ContentType.parse("application/vnd.github+json"))
                 bearerAuth(githubCredentials.get().password!!)
+            }
+            expectSuccess = true
+            install(Logging) {
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        this@UploadSignatures.logger.debug(message)
+                    }
+                }
+                level = LogLevel.ALL
             }
         }.use { client ->
             for (file in signatures) {
