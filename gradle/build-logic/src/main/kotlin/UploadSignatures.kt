@@ -43,7 +43,7 @@ abstract class UploadSignatures : DefaultTask() {
             install(Logging) {
                 logger = object : Logger {
                     override fun log(message: String) {
-                        this@UploadSignatures.logger.debug(message)
+                        this@UploadSignatures.logger.info(message)
                     }
                 }
                 level = LogLevel.ALL
