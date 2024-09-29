@@ -54,10 +54,7 @@ abstract class UploadSignatures : DefaultTask() {
                     "/repos/${githubRepository.get()}/attestations"
                 ) {
                     //language=json
-                    val bundle = """
-                        { "bundle": ${file.readText()} }
-                    """.trimIndent()
-                    setBody(bundle)
+                    setBody("""{ "bundle": ${file.readText()} }""")
                 }
             }
         }
