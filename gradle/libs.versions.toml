@@ -1,6 +1,9 @@
 [versions]
 kotlin = "2.1.0-Beta1"
 
+[libraries]
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version = "2.3.8" }
+
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 sigstore = { id = "dev.sigstore.sign", version = "1.0.0" }

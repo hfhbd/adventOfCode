@@ -54,3 +54,9 @@ tasks.withType(SigstoreSignFilesTask::class).configureEach {
         languageVersion.set(JavaLanguageVersion.of(21))
     })
 }
+
+tasks.register("uploadSignaturesToGitHub", UploadSignatures::class) {
+    signatures.from(tasks.withType(SigstoreSignFilesTask::class))
+    githubApiUrl = providers.environmentVariable("GITHUB_API_URL")
+    githubRepository = providers.environmentVariable("GITHUB_REPOSITORY")
+}
