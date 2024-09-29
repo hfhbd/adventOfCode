@@ -3,3 +3,4 @@ kotlin = "2.1.0-Beta1"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+sigstore = { id = "dev.sigstore.sign", version = "1.0.0" }
