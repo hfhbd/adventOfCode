@@ -14,6 +14,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
 
     env:
       GRADLE_OPTS: -Dorg.gradle.caching=true
@@ -28,5 +29,3 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_GitHubPackagesUsername: ${{ github.actor }}
           ORG_GRADLE_PROJECT_GitHubPackagesPassword: ${{ github.token }}
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
