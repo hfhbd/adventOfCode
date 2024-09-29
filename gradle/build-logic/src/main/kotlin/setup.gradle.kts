@@ -23,6 +23,18 @@ publishing {
     publications.register<MavenPublication>("gpr") {
         from(components["java"])
     }
+    publications.withType<MavenPublication>().configureEach {
+        this.pom {
+            // https://github.com/gradle/gradle/issues/28759
+            this.withXml {
+                this.asNode().appendNode("distributionManagement").appendNode("repository").apply {
+                    this.appendNode("id", "github")
+                    this.appendNode("name", "GitHub hfhbd Apache Maven Packages")
+                    this.appendNode("url", "https://maven.pkg.github.com/hfhbd/adventOfCode")
+                }
+            }
+        }
+    }
 }
 
 java {
