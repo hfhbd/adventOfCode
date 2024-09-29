@@ -1,3 +1,5 @@
+import dev.sigstore.sign.tasks.SigstoreSignFilesTask
+
 plugins {
     kotlin("jvm")
     id("maven-publish")
@@ -33,4 +35,10 @@ tasks.withType<AbstractArchiveTask>().configureEach {
     isReproducibleFileOrder = true
     filePermissions {}
     dirPermissions {}
+}
+
+tasks.withType(SigstoreSignFilesTask::class).configureEach {
+    launcher.set(javaToolchains.launcherFor {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    })
 }
