@@ -1,10 +1,7 @@
-import dev.sigstore.sign.tasks.SigstoreSignFilesTask
-
 plugins {
     kotlin("jvm")
     id("maven-publish")
     id("signing")
-    id("dev.sigstore.sign")
 }
 
 kotlin.jvmToolchain(8)
@@ -42,21 +39,17 @@ java {
     withSourcesJar()
 }
 
+signing {
+    val signingKey = providers.gradleProperty("signingKey")
+    if (signingKey.isPresent) {
+        useInMemoryPgpKeys(signingKey.get(), providers.gradleProperty("signingPassword").get())
+        sign(publishing.publications)
+    }
+}
+
 tasks.withType<AbstractArchiveTask>().configureEach {
     isPreserveFileTimestamps = false
     isReproducibleFileOrder = true
     filePermissions {}
     dirPermissions {}
-}
-
-tasks.withType(SigstoreSignFilesTask::class).configureEach {
-    launcher.set(javaToolchains.launcherFor {
-        languageVersion.set(JavaLanguageVersion.of(21))
-    })
-}
-
-tasks.register("uploadSignaturesToGitHub", UploadSignatures::class) {
-    signatures.from(tasks.withType(SigstoreSignFilesTask::class))
-    githubApiUrl = providers.environmentVariable("GITHUB_API_URL")
-    githubRepository = providers.environmentVariable("GITHUB_REPOSITORY")
 }
