@@ -54,19 +54,17 @@ tasks.withType<AbstractArchiveTask>().configureEach {
     dirPermissions {}
 }
 
-val githubPublications = configurations.consumable("githubPublications") {
+configurations.consumable("githubPublications") {
     attributes {
         attribute(Usage.USAGE_ATTRIBUTE, objects.named("GITHUB_OUTPUT"))
     }
+    outgoing {
+        artifacts(provider {
+            publishing.publications.withType<MavenPublication>().flatMap {
+                it.artifacts
+            }.map {
+                it.file
+            }
+        })
+    }
 }
-
-val sharePublications by tasks.registering(SharePublications::class) {
-    sourceFiles.from(publishing.publications.withType<MavenPublication>().flatMap {
-        it.artifacts
-    }.map {
-        it.file
-    })
-    targetFile.set(layout.buildDirectory.file("github/publications/outputFiles.txt"))
-}
-
-artifacts.add(githubPublications.name, sharePublications)
