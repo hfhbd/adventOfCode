@@ -14,6 +14,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
+      attestations: write
 
     steps:
       - name: Set environment for version
@@ -31,3 +33,9 @@ jobs:
           ORG_GRADLE_PROJECT_GitHubPackagesPassword: ${{ github.token }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
+      - name: Write outputs
+        id: publications
+        run: ./gradlew :writePublicationsToGitHubOutput
+      - uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: ${{ steps.publications.outputs.publishedFiles }}
