@@ -9,13 +9,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-      id-token: write
-      attestations: write
 
     steps:
       - name: Set environment for version
@@ -36,16 +34,22 @@ jobs:
       - name: Write outputs
         id: publications
         run: ./gradlew :writePublicationsToGitHubOutput
-      - run: echo ${{ steps.publications.outputs.publishedFiles }}
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day1/build/libs/day1.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day1/build/libs/day1-javadoc.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day1/build/libs/day1-sources.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day2/build/libs/day2.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day2/build/libs/day2-sources.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day2/build/libs/day2-javadoc.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day3/build/libs/day3-javadoc.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day3/build/libs/day3-sources.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day3/build/libs/day3.jar
+      - uses: actions/upload-artifact@v4
+        with:
+          path: ${{ steps.publications.outputs.publishedFiles }}
+
+  attest:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+
+    steps:
+      - uses: actions/download-artifact@v4
+        id: download
+        with:
+          path: jars
       - uses: actions/attest-build-provenance@v1
         with:
-          subject-path: ${{ steps.publications.outputs.publishedFiles }}
+          subject-path: ${{ steps.download.outputs.download-path }}
