@@ -17,9 +17,9 @@ abstract class WritePublicationsToGitHubOutputFile : DefaultTask() {
     internal fun action() {
         githubOutputFile.get().asFile.appendText(
             publicationFiles.joinToString(
-                prefix = "publishedFiles=",
-                separator = ", ",
-                postfix = "\n",
+                prefix = "publishedFiles<<EOF\n",
+                separator = "\n",
+                postfix = "\nEOF\n",
             ) {
                 it.absolutePath
             }
