@@ -19,7 +19,7 @@ abstract class WritePublicationsToGitHubOutputFile : DefaultTask() {
             publicationFiles.joinToString(
                 prefix = "publishedFiles<<EOF\n",
                 separator = "\n",
-                postfix = "EOF\n",
+                postfix = "\nEOF\n",
             ) {
                 it.absolutePath
             }
