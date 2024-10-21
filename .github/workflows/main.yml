@@ -24,16 +24,4 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           cache-encryption-key: ${{ secrets.CC }}
-      - name: Write outputs
-        id: publications
-        run: ./gradlew :writePublicationsToGitHubOutput
-      - run: echo ${{ steps.publications.outputs.publishedFiles }}
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day1/build/libs/day1.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day1/build/libs/day1-javadoc.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day1/build/libs/day1-sources.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day2/build/libs/day2.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day2/build/libs/day2-sources.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day2/build/libs/day2-javadoc.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day3/build/libs/day3-javadoc.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day3/build/libs/day3-sources.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day3/build/libs/day3.jar
+      - run: ./gradlew build
