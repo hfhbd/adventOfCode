@@ -24,4 +24,5 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           cache-encryption-key: ${{ secrets.CC }}
-      - run: ./gradlew build
+      - name: Build with Gradle
+        run: ./gradlew build
