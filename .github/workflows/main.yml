@@ -29,3 +29,8 @@ jobs:
       - name: Write outputs
         id: publications
         run: ./gradlew :writePublicationsToGitHubOutput
+      - uses: actions/upload-artifact@v4
+        with:
+          path: ${{ steps.publications.outputs.publishedFiles }}
+          compression-level: 0
+          if-no-files-found: error

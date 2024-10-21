@@ -14,5 +14,6 @@ dependencies {
 
 tasks.register("writePublicationsToGithubOutputFile", WritePublicationsToGitHubOutputFile::class) {
     publicationFiles.from(subPublicationFiles)
+    rootDirectory.set(layout.projectDirectory)
     githubOutputFile.set(file(providers.environmentVariable("GITHUB_OUTPUT")))
 }
