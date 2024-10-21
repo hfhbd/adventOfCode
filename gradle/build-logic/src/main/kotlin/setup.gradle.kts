@@ -10,6 +10,11 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     repositories {
         maven(url = "https://maven.pkg.github.com/hfhbd/adventOfCode") {
@@ -32,11 +37,6 @@ publishing {
             }
         }
     }
-}
-
-java {
-    withJavadocJar()
-    withSourcesJar()
 }
 
 signing {
