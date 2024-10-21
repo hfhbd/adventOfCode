@@ -24,8 +24,6 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           cache-encryption-key: ${{ secrets.CC }}
-      - name: Build with Gradle
-        run: ./gradlew build
       - name: Write outputs
         id: publications
         run: ./gradlew :writePublicationsToGitHubOutput
