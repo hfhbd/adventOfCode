@@ -34,6 +34,7 @@ jobs:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
       - run: echo "$PWD"
+      - run: ls -laR day1/build
       - run: ls /home/runner/work/adventOfCode/adventOfCode/day1/build/libs/day1.jar
       - run: ls /home/runner/work/adventOfCode/adventOfCode/day1/build/libs/day1-javadoc.jar
       - run: ls /home/runner/work/adventOfCode/adventOfCode/day1/build/libs/day1-sources.jar

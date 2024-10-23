@@ -34,6 +34,7 @@ jobs:
           path: ${{ steps.publications.outputs.publishedFiles }}
           compression-level: 0
           if-no-files-found: error
+      - run: ls -laR day1/build
       - run: echo "$PWD"
       - run: ls /home/runner/work/adventOfCode/adventOfCode/day1/build/libs/day1.jar
       - run: ls /home/runner/work/adventOfCode/adventOfCode/day1/build/libs/day1-javadoc.jar
