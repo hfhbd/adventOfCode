@@ -26,6 +26,7 @@ abstract class WritePublicationsToGitHubOutputFile : DefaultTask() {
                 separator = "\n",
                 postfix = "\nEOF\n",
             ) {
+                require(it.exists()) { "File does not exist: ${it.absolutePath}" }
                 it.toRelativeString(rootDirectory.get().asFile)
             }
         )
