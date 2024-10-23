@@ -50,13 +50,12 @@ configurations.consumable("githubPublications") {
         attribute(Usage.USAGE_ATTRIBUTE, objects.named("GITHUB_OUTPUT"))
     }
     outgoing {
-        val foo = publishing.publications.withType<MavenPublication>()
-        val s = files(foo.map { it.artifacts.map { it.file } }) {
-            builtBy(foo.map { it.artifacts })
-        }
-
-        artifacts(provider { s.elements.get() }) {
-            builtBy(foo.map { it.artifacts.map { it.buildDependencies } })
-        }
+        artifacts(provider {
+            publishing.publications.withType<MavenPublication>().flatMap {
+                it.artifacts
+            }.map {
+                it.file
+            }
+        })
     }
 }
