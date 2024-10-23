@@ -34,3 +34,13 @@ jobs:
           path: ${{ steps.publications.outputs.publishedFiles }}
           compression-level: 0
           if-no-files-found: error
+      - run: echo "$PWD"
+      - run: ls /home/runner/work/adventOfCode/adventOfCode/day1/build/libs/day1.jar
+      - run: ls /home/runner/work/adventOfCode/adventOfCode/day1/build/libs/day1-javadoc.jar
+      - run: ls /home/runner/work/adventOfCode/adventOfCode/day1/build/libs/day1-sources.jar
+      - run: ls /home/runner/work/adventOfCode/adventOfCode/day2/build/libs/day2.jar
+      - run: ls /home/runner/work/adventOfCode/adventOfCode/day2/build/libs/day2-sources.jar
+      - run: ls /home/runner/work/adventOfCode/adventOfCode/day2/build/libs/day2-javadoc.jar
+      - run: ls /home/runner/work/adventOfCode/adventOfCode/day3/build/libs/day3-javadoc.jar
+      - run: ls /home/runner/work/adventOfCode/adventOfCode/day3/build/libs/day3-sources.jar
+      - run: ls /home/runner/work/adventOfCode/adventOfCode/day3/build/libs/day3.jar
