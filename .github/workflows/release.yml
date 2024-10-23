@@ -33,20 +33,9 @@ jobs:
           ORG_GRADLE_PROJECT_GitHubPackagesPassword: ${{ github.token }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
-      - run: echo "$PWD"
-      - run: ls -laR day1/build
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day1/build/libs/day1.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day1/build/libs/day1-javadoc.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day1/build/libs/day1-sources.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day2/build/libs/day2.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day2/build/libs/day2-sources.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day2/build/libs/day2-javadoc.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day3/build/libs/day3-javadoc.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day3/build/libs/day3-sources.jar
-      - run: ls /home/runner/work/adventOfCode/adventOfCode/day3/build/libs/day3.jar
       - name: Write outputs
         id: publications
-        run: ./gradlew :writePublicationsToGitHubOutput
+        run: ./gradlew :writePublicationsToGitHubOutput -Pversion=$version
       - uses: actions/attest-build-provenance@v1
         with:
           subject-path: ${{ steps.publications.outputs.publishedFiles }}
