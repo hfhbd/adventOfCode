@@ -113,9 +113,11 @@ abstract class PublishWorker : WorkAction<PublishWorker.PublishParameters> {
             when (status.deployment.value.deploymentState) {
                 DeploymentState.PENDING,
                 DeploymentState.VALIDATING,
-                DeploymentState.PUBLISHING,
+                DeploymentState.VALIDATED,
                 -> continue
-                DeploymentState.PUBLISHED -> break
+                DeploymentState.PUBLISHING,
+                DeploymentState.PUBLISHED,
+                -> break
                 DeploymentState.FAILED -> error(status.deployment.value.error)
             }
         }
@@ -146,6 +148,7 @@ private data class Value(
 private enum class DeploymentState {
     PENDING,
     VALIDATING,
+    VALIDATED,
     PUBLISHING,
     PUBLISHED,
     FAILED,
