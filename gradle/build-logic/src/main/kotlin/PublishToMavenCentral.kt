@@ -6,14 +6,15 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
+import io.ktor.http.*
 import io.ktor.http.ContentType.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.util.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.io.asSource
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonObject
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.repositories.PasswordCredentials
 import org.gradle.api.file.ConfigurableFileCollection
@@ -90,9 +91,11 @@ abstract class PublishWorker : WorkAction<PublishWorker.PublishParameters> {
                 }
             }
         }
-        val deploymentId = client.submitFormWithBinaryData(
-            url = "api/v1/publisher/upload",
-            formData = formData {
+        val deploymentId = client.post(
+            urlString = "api/v1/publisher/upload",
+        ) {
+            contentType(MultiPart.FormData)
+            setBody(MultiPartFormDataContent(formData {
                 append(
                     key = "bundle",
                     filename = zipFile.name,
@@ -101,47 +104,37 @@ abstract class PublishWorker : WorkAction<PublishWorker.PublishParameters> {
                 ) {
                     transferFrom(zipFile.inputStream().asSource())
                 }
-            },
-        ) {
-            parameter("publishingType", "AUTOMATIC")
+            }))
+            parameter("publishingType", PublishingTypePublishingType.Automatic)
         }.body<String>()
         while (true) {
             delay(500.milliseconds)
             val status = client.post("api/v1/publisher/status") {
                 parameter("id", deploymentId)
-            }.body<Status>()
-            when (status.deployment.value.deploymentState) {
+            }.body<CheckStatus>()
+            when (status.deploymentState) {
                 DeploymentState.PENDING,
                 DeploymentState.VALIDATING,
                 DeploymentState.VALIDATED,
                 -> continue
+
                 DeploymentState.PUBLISHING,
                 DeploymentState.PUBLISHED,
                 -> break
-                DeploymentState.FAILED -> error(status.deployment.value.error)
+
+                DeploymentState.FAILED -> error(status.errors)
             }
         }
     }
 }
 
 @Serializable
-private data class Status(
-    val deployment: Deployment,
-)
-
-@Serializable
-private data class Deployment(
-    val summary: String,
-    val value: Value,
-)
-
-@Serializable
-private data class Value(
+private data class CheckStatus(
     val deploymentId: String,
     val deploymentName: String,
     val deploymentState: DeploymentState,
     val purls: List<String>,
-    val error: JsonObject,
+    val errors: List<String>,
 )
 
 @Serializable
@@ -153,4 +146,13 @@ private enum class DeploymentState {
     PUBLISHED,
     FAILED,
     ;
+}
+
+@Serializable
+public enum class PublishingTypePublishingType {
+    @SerialName(value = "USER_MANAGED")
+    UserManaged,
+
+    @SerialName(value = "AUTOMATIC")
+    Automatic,
 }
