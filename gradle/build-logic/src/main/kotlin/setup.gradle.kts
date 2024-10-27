@@ -23,7 +23,7 @@ publishing {
             credentials(PasswordCredentials::class)
         }
     }
-    publications.register("gpr", MavenPublication::class) {
+    publications.register<MavenPublication>("gpr") {
         from(components["java"])
     }
     publications.withType<MavenPublication>().configureEach {
