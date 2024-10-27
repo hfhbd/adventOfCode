@@ -43,7 +43,6 @@ abstract class PublishToMavenCentral : DefaultTask() {
     @get:Inject
     internal abstract val workerExecutor: WorkerExecutor
 
-    @get:InputFiles
     @get:Classpath
     internal abstract val workerClassPath: ConfigurableFileCollection
 

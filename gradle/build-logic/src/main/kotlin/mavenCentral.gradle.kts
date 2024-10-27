@@ -4,7 +4,9 @@ plugins {
 }
 
 val mavenCentral = configurations.dependencyScope("mavenCentralWorker")
-val mavenCentralWorkerClassPath = configurations.resolvable("mavenCentralWorkerClasspath")
+val mavenCentralWorkerClassPath = configurations.resolvable("mavenCentralWorkerClasspath") {
+    extendsFrom(mavenCentral.get())
+}
 
 dependencies {
     mavenCentral("io.ktor:ktor-client-java:3.0.0")
