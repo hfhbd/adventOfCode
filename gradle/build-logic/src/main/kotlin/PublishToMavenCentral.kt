@@ -13,8 +13,8 @@ import io.ktor.util.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.io.asSource
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.repositories.PasswordCredentials
 import org.gradle.api.file.ConfigurableFileCollection
@@ -83,10 +83,10 @@ abstract class PublishWorker : WorkAction<PublishWorker.PublishParameters> {
                 json()
             }
             install(Logging) {
-                level = LogLevel.ALL
+                level = LogLevel.BODY
                 logger = object : Logger {
                     override fun log(message: String) {
-                        this@PublishWorker.logger.debug(message)
+                        this@PublishWorker.logger.quiet(message)
                     }
                 }
             }
@@ -134,7 +134,7 @@ private data class CheckStatus(
     val deploymentName: String,
     val deploymentState: DeploymentState,
     val purls: List<String>,
-    val errors: List<String>,
+    val errors: JsonObject,
 )
 
 @Serializable
