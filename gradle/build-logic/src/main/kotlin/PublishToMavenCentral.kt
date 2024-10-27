@@ -105,7 +105,7 @@ abstract class PublishWorker : WorkAction<PublishWorker.PublishParameters> {
                     transferFrom(zipFile.inputStream().asSource())
                 }
             }))
-            parameter("publishingType", PublishingTypePublishingType.Automatic)
+            parameter("publishingType", "AUTOMATIC")
         }.body<String>()
         while (true) {
             delay(500.milliseconds)
@@ -146,13 +146,4 @@ private enum class DeploymentState {
     PUBLISHED,
     FAILED,
     ;
-}
-
-@Serializable
-public enum class PublishingTypePublishingType {
-    @SerialName(value = "USER_MANAGED")
-    UserManaged,
-
-    @SerialName(value = "AUTOMATIC")
-    Automatic,
 }
