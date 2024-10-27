@@ -113,16 +113,16 @@ abstract class PublishWorker : WorkAction<PublishWorker.PublishParameters> {
                 parameter("id", deploymentId)
             }.body<CheckStatus>()
             when (status.deploymentState) {
-                DeploymentState.PENDING,
-                DeploymentState.VALIDATING,
-                DeploymentState.VALIDATED,
+                DeploymentResponseFilesDeploymentState.PENDING,
+                DeploymentResponseFilesDeploymentState.VALIDATING,
+                DeploymentResponseFilesDeploymentState.VALIDATED,
                 -> continue
 
-                DeploymentState.PUBLISHING,
-                DeploymentState.PUBLISHED,
+                DeploymentResponseFilesDeploymentState.PUBLISHING,
+                DeploymentResponseFilesDeploymentState.PUBLISHED,
                 -> break
 
-                DeploymentState.FAILED -> error(status.errors)
+                DeploymentResponseFilesDeploymentState.FAILED -> error(status.errors)
             }
         }
     }
@@ -132,13 +132,14 @@ abstract class PublishWorker : WorkAction<PublishWorker.PublishParameters> {
 private data class CheckStatus(
     val deploymentId: String,
     val deploymentName: String,
-    val deploymentState: DeploymentState,
+    val deploymentState: DeploymentResponseFilesDeploymentState,
     val purls: List<String>,
     val errors: JsonObject,
+    val cherryBomUrl: String? = null,
 )
 
 @Serializable
-private enum class DeploymentState {
+private enum class DeploymentResponseFilesDeploymentState {
     PENDING,
     VALIDATING,
     VALIDATED,
