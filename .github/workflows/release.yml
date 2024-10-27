@@ -17,6 +17,8 @@ jobs:
       id-token: write
       attestations: write
 
+    environment: CD
+
     steps:
       - name: Set environment for version
         run: long="${{ github.ref }}"; version=${long#"refs/tags/v"}; echo "version=${version}" >> $GITHUB_ENV
