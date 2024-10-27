@@ -1,6 +1,8 @@
 plugins {
     kotlin("jvm")
     id("maven-publish")
+    id("signing")
+    id("mavenCentral")
 }
 
 kotlin.jvmToolchain(8)
@@ -25,7 +27,29 @@ publishing {
         from(components["java"])
     }
     publications.withType<MavenPublication>().configureEach {
-        this.pom {
+        pom {
+            name.set("hfhbd AdventOfCode")
+            description.set("hfhbd AdventOfCode")
+            url.set("https://github.com/hfhbd/adventOfCode")
+            licenses {
+                license {
+                    name.set("The Apache License, Version 2.0")
+                    url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                }
+            }
+            developers {
+                developer {
+                    id.set("hfhbd")
+                    name.set("Philip Wedemann")
+                    email.set("mybztg+mavencentral@icloud.com")
+                }
+            }
+            scm {
+                connection.set("scm:git://github.com/hfhbd/adventOfCode.git")
+                developerConnection.set("scm:git://github.com/hfhbd/adventOfCode.git")
+                url.set("https://github.com/hfhbd/adventOfCode")
+            }
+
             // https://github.com/gradle/gradle/issues/28759
             this.withXml {
                 this.asNode().appendNode("distributionManagement").appendNode("repository").apply {
@@ -35,6 +59,14 @@ publishing {
                 }
             }
         }
+    }
+}
+
+signing {
+    val signingKey = providers.gradleProperty("signingKey")
+    if (signingKey.isPresent) {
+        useInMemoryPgpKeys(signingKey.get(), providers.gradleProperty("signingPassword").get())
+        sign(publishing.publications)
     }
 }
 
