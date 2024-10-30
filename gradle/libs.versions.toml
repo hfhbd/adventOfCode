@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.1.0-Beta2"
-ktor = "3.0.0"
+ktor = "3.0.1"
 
 [libraries]
 ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
