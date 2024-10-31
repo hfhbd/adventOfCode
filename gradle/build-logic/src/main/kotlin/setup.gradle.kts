@@ -2,7 +2,7 @@ plugins {
     kotlin("jvm")
     id("maven-publish")
     id("signing")
-    id("mavenCentral")
+    id("io.github.hfhbd.mavencentral")
 }
 
 kotlin.jvmToolchain(8)
