@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-    implementation(projects.day2)
+    api(projects.day2)
 }
