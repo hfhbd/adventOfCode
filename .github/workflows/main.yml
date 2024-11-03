@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - run: echo echo "a.f=a\nb.f=b" >> "$GITHUB_OUTPUT"
+      - run: echo "a.f=a\nb.f=b" >> "$GITHUB_OUTPUT"
         id: f
       - run: echo ${{ steps.f.outputs.a.f }}
       - run: echo ${{ steps.f.outputs.b.f }}
