@@ -16,4 +16,7 @@ jobs:
         id: f
       - run: echo ${{ steps.f.outputs.a.f }}
       - run: echo ${{ steps.f.outputs.b.f }}
+      - id: step1
+        run: echo "test=hello" >> "$GITHUB_OUTPUT"
+      - run: echo ${{ steps.step1.outputs.test }}
       - run: echo ${{ join(steps.f.outputs.*.f) }}
