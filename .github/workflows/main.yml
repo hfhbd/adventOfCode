@@ -26,6 +26,6 @@ jobs:
           cache-encryption-key: ${{ secrets.CC }}
       - name: Build with Gradle
         run: ./gradlew build
-      - run: echo echo "a_f=a\nb_f=b" >> "$GITHUB_OUTPUT"
+      - run: echo echo "a.f=a\nb.f=b" >> "$GITHUB_OUTPUT"
         id: f
-      - run: echo ${{ join(steps.f.outputs.*_f) }}
+      - run: echo ${{ join(steps.f.outputs.*.f) }}
