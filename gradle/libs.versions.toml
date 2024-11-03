@@ -3,4 +3,4 @@ kotlin = "2.1.0-Beta2"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-mavencentral = { id = "io.github.hfhbd.mavencentral", version = "0.0.8" }
+mavencentral = { id = "io.github.hfhbd.mavencentral", version = "0.0.11" }
