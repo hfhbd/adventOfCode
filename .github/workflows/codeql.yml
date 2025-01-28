@@ -1,4 +1,4 @@
-name: Dependency review for pull requests
+name: "CodeQL"
 
 on:
   push:
@@ -7,10 +7,13 @@ on:
     branches: [ main ]
 
 jobs:
-  dependency-submission:
+  analyze:
+    name: Analyze
     runs-on: ubuntu-24.04-arm
     permissions:
-      contents: write
+      actions: read
+      contents: read
+      security-events: write
 
     steps:
       - uses: actions/checkout@v4
@@ -23,9 +26,18 @@ jobs:
         with:
           path: gradle/build-logic/build
           key: build-logic-${{ hashFiles('gradle/build-logic/src/**', 'gradle/build-logic/build.gradle.kts','gradle/build-logic/settings.gradle.kts') }}
-      - uses: gradle/actions/dependency-submission@v4
+      - uses: gradle/actions/setup-gradle@v4
         with:
           cache-encryption-key: ${{ secrets.CC }}
 
-      - uses: actions/dependency-review-action@v4
-        if: github.event_name == 'pull_request'
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: kotlin
+          build-mode: manual
+
+      - name: Build with Gradle
+        run: ./gradlew --no-build-cache classes
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
