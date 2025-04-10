@@ -7,8 +7,10 @@ plugins {
 
 kotlin.jvmToolchain(8)
 
-dependencies {
-    testImplementation(kotlin("test"))
+testing {
+    suites.named("test", JvmTestSuite::class) {
+        useKotlinTest()
+    }
 }
 
 java {
@@ -33,7 +35,7 @@ publishing {
             url.set("https://github.com/hfhbd/adventOfCode")
             licenses {
                 license {
-                    name.set("The Apache License, Version 2.0")
+                    name.set("Apache-2.0")
                     url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
                 }
             }
