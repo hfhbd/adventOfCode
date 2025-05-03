@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    id("java-test-fixtures")
     id("maven-publish")
     id("signing")
     id("io.github.hfhbd.mavencentral")
