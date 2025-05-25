@@ -6,7 +6,7 @@ plugins {
     id("io.github.hfhbd.mavencentral")
 }
 
-kotlin.jvmToolchain(8)
+kotlin.jvmToolchain(21)
 
 testing.suites.withType(JvmTestSuite::class).configureEach {
     useKotlinTest()
