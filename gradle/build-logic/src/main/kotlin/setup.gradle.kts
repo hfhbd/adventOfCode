@@ -8,7 +8,7 @@ plugins {
 
 kotlin.jvmToolchain(8)
 
-testing.suites.configureEach(JvmTestSuite::class) {
+testing.suites.withType(JvmTestSuite::class).configureEach {
     useKotlinTest()
 }
 
