@@ -23,6 +23,10 @@ publishing {
             name = "GitHubPackages"
             credentials(PasswordCredentials::class)
         }
+        maven(url = "https://central.sonatype.com/repository/maven-snapshots/") {
+            name = "mavenCentralSnapshot"
+            credentials(PasswordCredentials::class)
+        }
     }
     publications.register<MavenPublication>("gpr") {
         from(components["java"])
