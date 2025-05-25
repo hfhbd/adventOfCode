@@ -3,31 +3,30 @@ name: Release
 on:
   release:
     types: [ created ]
+  push:
+    branches: [ main ]
 
 concurrency:
   group: release
   cancel-in-progress: false
 
 jobs:
-  publish:
+  publishMavenCentral:
     runs-on: ubuntu-24.04-arm
     permissions:
       contents: read
-      packages: write
-      id-token: write
-      attestations: write
 
     environment: CD
 
     steps:
       - name: Set environment for version
-        run: long="${{ github.ref }}"; version=${long#"refs/tags/v"}; echo "version=${version}" >> $GITHUB_OUTPUT
+        uses: hfhbd/actions/setup-version@main
         id: version
       - uses: actions/checkout@v4
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Release maven artifacts
-        run: ./gradlew publish -Pversion=${{ steps.version.outputs.version }}
+        run: ./gradlew publishToMavenCentral -Pversion=${{ steps.version.outputs.version }}
         env:
           ORG_GRADLE_PROJECT_GitHubPackagesUsername: ${{ github.actor }}
           ORG_GRADLE_PROJECT_GitHubPackagesPassword: ${{ github.token }}
@@ -35,3 +34,22 @@ jobs:
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.CENTRAL_PASSWORD }}
+
+  publishGitHubPackages:
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Set environment for version
+        uses: hfhbd/actions/setup-version@main
+        id: version
+      - uses: actions/checkout@v4
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Release maven artifacts
+        run: ./gradlew publishAllPublicationsToGitHubPackagesRepository -Pversion=${{ steps.version.outputs.version }}
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
