@@ -1,3 +1,5 @@
+package io.github.hfhbd.adventofcode.day1
+
 fun getDigits2(input: String) = input.lineSequence().map {
     // fast-path
     if (it.first().isDigit() && it.last().isDigit()) {

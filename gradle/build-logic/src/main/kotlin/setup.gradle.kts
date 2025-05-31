@@ -17,6 +17,10 @@ java {
     withSourcesJar()
 }
 
+tasks.javadoc {
+    onlyIf { false }
+}
+
 publishing {
     repositories {
         maven(url = "https://maven.pkg.github.com/hfhbd/adventOfCode") {

@@ -1,3 +1,6 @@
+package io.github.hfhbd.adventofcode.day3
+
+import io.github.hfhbd.adventofcode.day1.getDigits
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

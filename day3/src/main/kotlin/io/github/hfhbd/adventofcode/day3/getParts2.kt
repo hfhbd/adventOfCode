@@ -1,3 +1,5 @@
+package io.github.hfhbd.adventofcode.day3
+
 fun getParts2(input: String) = sequence {
     val lines = input.lines()
     for ((lineNumber, line) in lines.withIndex()) {

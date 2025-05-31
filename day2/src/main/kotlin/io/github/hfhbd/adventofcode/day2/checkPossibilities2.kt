@@ -1,3 +1,5 @@
+package io.github.hfhbd.adventofcode.day2
+
 import kotlin.math.max
 
 fun checkPossibilities2(input: String) = input.lineSequence().map { game ->
