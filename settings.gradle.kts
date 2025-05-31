@@ -29,6 +29,7 @@ rootProject.name = "adventOfCode"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
 
-include(":day1")
-include(":day2")
-include(":day3")
+include(":year-2023-day1")
+include(":year-2023-day2")
+include(":year-2023-day3")
+include(":year-2023-day4")
