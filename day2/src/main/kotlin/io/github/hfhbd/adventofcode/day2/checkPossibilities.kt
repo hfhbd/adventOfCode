@@ -1,3 +1,5 @@
+package io.github.hfhbd.adventofcode.day2
+
 fun checkPossibilities(input: String, red: Int, green: Int, blue: Int): Sequence<Int> = sequence {
     games@for (game in input.lineSequence()) {
         val gameIndex = game.indexOf(':')

@@ -1,3 +1,5 @@
+package io.github.hfhbd.adventofcode.day2
+
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

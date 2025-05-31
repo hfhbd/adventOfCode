@@ -1,3 +1,5 @@
+package io.github.hfhbd.adventofcode.day1
+
 const val data = """ninefourone1
 53sevenvvqm
 kscpjfdxp895foureightckjjl1
