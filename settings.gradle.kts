@@ -10,6 +10,7 @@ plugins {
     id("myRepos")
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
     id("com.gradle.develocity") version "4.0.2"
+    id("app.softwork.kobol.settings") version "0.2.19"
 }
 
 develocity {
