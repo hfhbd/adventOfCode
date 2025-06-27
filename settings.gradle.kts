@@ -10,6 +10,7 @@ plugins {
     id("myRepos")
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
     id("com.gradle.develocity") version "4.0.2"
+    id("app.softwork.kobol.settings") version "0.2.19"
 }
 
 develocity {
@@ -32,3 +33,4 @@ enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
 include(":year-2023-day1")
 include(":year-2023-day2")
 include(":year-2023-day3")
+include(":year-2023-day4")
