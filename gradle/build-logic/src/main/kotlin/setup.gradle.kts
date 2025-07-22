@@ -31,6 +31,10 @@ publishing {
             name = "mavenCentralSnapshot"
             credentials(PasswordCredentials::class)
         }
+        maven(url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/") {
+            name = "mavenCentralStaging"
+            credentials(PasswordCredentials::class)
+        }
     }
     publications.register<MavenPublication>("gpr") {
         from(components["java"])
