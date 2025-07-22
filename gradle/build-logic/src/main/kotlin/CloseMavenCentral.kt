@@ -21,7 +21,9 @@ import org.gradle.api.artifacts.repositories.PasswordCredentials
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.kotlin.dsl.credentials
+import org.gradle.work.DisableCachingByDefault
 
+@DisableCachingByDefault(because = "Remote operation")
 abstract class CloseMavenCentral : DefaultTask() {
     @get:Inject
     internal abstract val workerExecutor: WorkerExecutor
@@ -29,9 +31,12 @@ abstract class CloseMavenCentral : DefaultTask() {
     @get:Classpath
     internal abstract val workerClassPath: ConfigurableFileCollection
 
-    @get:Input
+    @Input
     internal val credentials: Provider<PasswordCredentials> =
         project.providers.credentials(PasswordCredentials::class, "mavenCentralStaging")
+
+    @get:Input
+    abstract val namespace: Property<String>
 
     @TaskAction
     internal fun close() {
@@ -40,14 +45,16 @@ abstract class CloseMavenCentral : DefaultTask() {
         }.submit(CloseAction::class.java) {
             userName.set(credentials.map { it.username })
             password.set(credentials.map { it.password })
+            namespace.set(this@CloseMavenCentral.namespace)
         }
     }
 }
 
-abstract class CloseAction : WorkAction<CloseAction.Parameters> {
+internal abstract class CloseAction : WorkAction<CloseAction.Parameters> {
     interface Parameters : WorkParameters {
         val userName: Property<String>
         val password: Property<String>
+        val namespace: Property<String>
     }
 
     private val gradleLogger = GradleLogging.getLogger(CloseAction::class.java)
@@ -77,8 +84,9 @@ abstract class CloseAction : WorkAction<CloseAction.Parameters> {
                 }
             }
         }
+
         runBlocking {
-            client.post("manual/upload/defaultRepository/io.github.hfhbd") {
+            client.post("manual/upload/defaultRepository/${parameters.namespace.get()}") {
                 parameter("publishing_type", "automatic")
             }
         }
