@@ -17,6 +17,10 @@ import org.gradle.api.logging.Logging as GradleLogging
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.parameter
 import kotlinx.coroutines.runBlocking
+import org.gradle.api.artifacts.repositories.PasswordCredentials
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Input
+import org.gradle.kotlin.dsl.credentials
 
 abstract class CloseMavenCentral : DefaultTask() {
     @get:Inject
@@ -25,12 +29,17 @@ abstract class CloseMavenCentral : DefaultTask() {
     @get:Classpath
     internal abstract val workerClassPath: ConfigurableFileCollection
 
+    @get:Input
+    internal val credentials: Provider<PasswordCredentials> =
+        project.providers.credentials(PasswordCredentials::class, "mavenCentralStaging")
+
     @TaskAction
     internal fun close() {
         workerExecutor.classLoaderIsolation {
             classpath.from(workerClassPath)
         }.submit(CloseAction::class.java) {
-
+            userName.set(credentials.map { it.username })
+            password.set(credentials.map { it.password })
         }
     }
 }
