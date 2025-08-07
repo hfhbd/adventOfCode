@@ -5,6 +5,8 @@ plugins {
 dependencies {
     implementation(libs.plugins.kotlin.jvm.dep)
     implementation(libs.plugins.mavencentral.dep)
+    implementation(libs.plugins.foojay.dep)
+    implementation(libs.plugins.develocity.dep)
     compileOnly("io.ktor:ktor-client-java:3.2.1")
     compileOnly("io.ktor:ktor-client-logging:3.2.1")
 }
