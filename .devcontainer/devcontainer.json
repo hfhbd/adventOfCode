@@ -1,7 +1,15 @@
 {
     "image": "mcr.microsoft.com/devcontainers/java:21",
     "features": {
-        "ghcr.io/devcontainers/features/sshd:1": {}
+        "ghcr.io/devcontainers/features/sshd:1": {},
+        "./installKotlinLsp": {}
     },
-    "onCreateCommand": "./gradlew build"
+    "onCreateCommand": "./gradlew build",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "vscjava.vscode-gradle"
+            ]
+        }
+    }
 }

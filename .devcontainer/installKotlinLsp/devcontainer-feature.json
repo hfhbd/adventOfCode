@@ -1,0 +1,15 @@
+{
+    "id": "kotlin-lsp",
+    "version": "1.0.0",
+    "name": "Kotlin-lsp support",
+    "installsAfter": [
+        "ghcr.io/devcontainers/features/common-utils"
+    ],
+    "customizations": {
+    "vscode": {
+      "extensions": [
+        "/usr/local/share/kotlin.vsix"
+      ]
+    }
+  }
+}
