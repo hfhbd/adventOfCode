@@ -29,4 +29,4 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-chmod 755 "$VSIX_FILE"
+chmod 644 "$VSIX_FILE"
