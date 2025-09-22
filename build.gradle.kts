@@ -1,5 +1,5 @@
 plugins {
-    id("mavencentral-closing")
+    id("io.github.hfhbd.mavencentral.close")
 }
 
 tasks.closeMavenCentral {
