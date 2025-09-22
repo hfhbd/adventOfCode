@@ -1,8 +1,5 @@
-[versions]
-kotlin = "2.2.20"
-
 [plugins]
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.2.20" }
 mavencentral = { id = "io.github.hfhbd.mavencentral", version = "0.0.23" }
 
 foojay = { id = "org.gradle.toolchains.foojay-resolver-convention", version = "1.0.0" }
