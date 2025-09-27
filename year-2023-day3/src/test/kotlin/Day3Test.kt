@@ -1,13 +1,9 @@
 package io.github.hfhbd.adventofcode.year2023.day3
 
-import io.github.hfhbd.adventofcode.year2023.day1.getDigits
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class Day3Test {
-    @Test fun a() {
-        getDigits("")
-    }
     @Test
     fun partOneSample() {
         val input =

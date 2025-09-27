@@ -4,6 +4,7 @@ plugins {
     id("maven-publish")
     id("signing")
     id("io.github.hfhbd.mavencentral")
+    id("dev.detekt")
 }
 
 kotlin.jvmToolchain(21)
@@ -81,3 +82,19 @@ signing {
         sign(publishing.publications)
     }
 }
+
+val sarif = configurations.consumable("sarif") {
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named("detekt-sarif"))
+    }
+}
+
+val deleteBaseline = tasks.register<Delete>("deleteDetektBaseline") {
+    delete(tasks.detekt.flatMap { it.baseline })
+}
+
+tasks.detekt {
+    ignoreFailures = providers.gradleProperty("ignoreDetektFailures").map { it.toBoolean() }.orElse(false)
+}
+
+artifacts.add(sarif.name, tasks.detekt.flatMap { it.reports.sarif.outputLocation })

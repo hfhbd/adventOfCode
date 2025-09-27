@@ -1,6 +1,4 @@
-package io.github.hfhbd.adventofcode.year2023.day1
-
-const val data = """ninefourone1
+ninefourone1
 53sevenvvqm
 kscpjfdxp895foureightckjjl1
 72fivebt9ndgq
@@ -999,4 +997,4 @@ fiveeight5sevenone9twoseven
 sevenssrzkspld2
 qnzcvcthrsgjlnzxmxlppjdpnine8seven7
 eight7xhvkrcr
-two2tdjdfbqtqxrs119r"""
+two2tdjdfbqtqxrs119r

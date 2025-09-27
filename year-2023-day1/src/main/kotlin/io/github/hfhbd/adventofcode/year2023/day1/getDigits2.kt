@@ -1,9 +1,9 @@
 package io.github.hfhbd.adventofcode.year2023.day1
 
-fun getDigits2(input: String) = input.lineSequence().map {
+fun Sequence<String>.getDigits2() = map {
     // fast-path
     if (it.first().isDigit() && it.last().isDigit()) {
-        return@map (it.first().digitToInt() * 10) + it.last().digitToInt()
+        return@map it.first().digitToInt() * 10 + it.last().digitToInt()
     }
 
     var first: Int? = null
@@ -47,7 +47,7 @@ fun getDigits2(input: String) = input.lineSequence().map {
         break
     }
 
-    return@map (first!! * 10) + last!!
+    return@map requireNotNull(first) * 10 + requireNotNull(last)
 }
 
 private fun String.containsReverse(index: Int, content: String) = contains(index - content.lastIndex, content)

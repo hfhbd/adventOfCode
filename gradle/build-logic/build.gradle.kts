@@ -5,6 +5,7 @@ plugins {
 dependencies {
     implementation(libs.plugins.kotlin.jvm.dep)
     implementation(libs.plugins.mavencentral.dep)
+    implementation(libs.plugins.detekt.dep)
     implementation(libs.plugins.foojay.dep)
     implementation(libs.plugins.develocity.dep)
 }
