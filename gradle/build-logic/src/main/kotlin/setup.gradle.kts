@@ -89,4 +89,12 @@ val sarif = configurations.consumable("sarif") {
     }
 }
 
+val deleteBaseline = tasks.register<Delete>("deleteDetektBaseline") {
+    delete(tasks.detekt.flatMap { it.baseline })
+}
+
+tasks.detekt {
+    ignoreFailures = providers.gradleProperty("ignoreDetektFailures").map { it.toBoolean() }.orElse(false)
+}
+
 artifacts.add(sarif.name, tasks.detekt.flatMap { it.reports.sarif.outputLocation })
