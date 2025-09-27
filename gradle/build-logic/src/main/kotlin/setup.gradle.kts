@@ -4,6 +4,7 @@ plugins {
     id("maven-publish")
     id("signing")
     id("io.github.hfhbd.mavencentral")
+    id("dev.detekt")
 }
 
 kotlin.jvmToolchain(21)
@@ -81,3 +82,11 @@ signing {
         sign(publishing.publications)
     }
 }
+
+val sarif = configurations.consumable("sarif") {
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named("detekt-sarif"))
+    }
+}
+
+artifacts.add(sarif.name, tasks.detekt.flatMap { it.reports.sarif.outputLocation })

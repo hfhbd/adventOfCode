@@ -23,3 +23,24 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
+
+      - name: Detekt
+        run: ./gradlew :mergeDetektSarif
+        if: always()
+      - name: Upload SARIF to Github using the upload-sarif action
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: build/reports/detekt/detekt.sarif
+          category: detekt
+
+      - name: Delete baseline to upload suppressed code-smells to GitHub
+        run: find . -name 'detekt-baseline.xml' -delete
+      - name: Run detekt baseline
+        run: ./gradlew :mergeDetektSarif
+        continue-on-error: true
+      - name: Upload detekt baseline to Github
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: build/reports/detekt/detekt.sarif
+          category: detektBaseline
