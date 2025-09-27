@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:getDigits2.kt:fun Sequence&lt;String&gt;.getDigits2()</ID>
+    <ID>InvalidPackageDeclaration:Day1Test.kt:package io.github.hfhbd.adventofcode.year2023.day1</ID>
+    <ID>LoopWithTooManyJumpStatements:getDigits2.kt:for</ID>
+    <ID>MagicNumber:getDigits.kt:10</ID>
+    <ID>MagicNumber:getDigits2.kt:10</ID>
+    <ID>MagicNumber:getDigits2.kt:3</ID>
+    <ID>MagicNumber:getDigits2.kt:4</ID>
+    <ID>MagicNumber:getDigits2.kt:5</ID>
+    <ID>MagicNumber:getDigits2.kt:6</ID>
+    <ID>MagicNumber:getDigits2.kt:7</ID>
+    <ID>MagicNumber:getDigits2.kt:8</ID>
+    <ID>MagicNumber:getDigits2.kt:9</ID>
+    <ID>ReturnCount:getDigits2.kt:private fun String.contains(index: Int, content: String): Boolean</ID>
+  </CurrentIssues>
+</SmellBaseline>
