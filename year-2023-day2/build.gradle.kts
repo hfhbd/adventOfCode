@@ -2,10 +2,6 @@ plugins {
     id("setup")
 }
 
-dependencies {
-    api(projects.year2023Day1)
-}
-
 tasks.compileJava {
     options.compilerArgumentProviders += object : CommandLineArgumentProvider {
 
