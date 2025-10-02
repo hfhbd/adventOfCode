@@ -17,7 +17,7 @@ jobs:
         with:
           path: gradle/build-logic/build
           key: build-logic-${{ hashFiles('gradle/build-logic/src/**', 'gradle/build-logic/build.gradle.kts','gradle/build-logic/settings.gradle.kts') }}
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
         with:
           cache-encryption-key: ${{ secrets.CC }}
 
