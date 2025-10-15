@@ -1,3 +1,5 @@
+import org.gradle.api.Project.DEFAULT_VERSION
+
 plugins {
     kotlin("jvm")
     id("java-test-fixtures")
@@ -20,6 +22,10 @@ java {
 
 tasks.javadoc {
     onlyIf { false }
+}
+
+tasks.compileJava {
+    options.javaModuleVersion.set(project.version.toString().takeUnless { it == DEFAULT_VERSION })
 }
 
 publishing {
@@ -83,18 +89,21 @@ signing {
     }
 }
 
+detekt {
+    parallel = true
+    autoCorrect = true
+    buildUponDefaultConfig = true
+    ignoreFailures = providers.gradleProperty("ignoreDetektFailures").map { it.toBoolean() }.orElse(false)
+}
+
+tasks.register<Delete>("deleteDetektBaseline") {
+    delete(tasks.detekt.flatMap { it.baseline })
+}
+
 val sarif = configurations.consumable("sarif") {
     attributes {
         attribute(Usage.USAGE_ATTRIBUTE, objects.named("detekt-sarif"))
     }
-}
-
-val deleteBaseline = tasks.register<Delete>("deleteDetektBaseline") {
-    delete(tasks.detekt.flatMap { it.baseline })
-}
-
-tasks.detekt {
-    ignoreFailures = providers.gradleProperty("ignoreDetektFailures").map { it.toBoolean() }.orElse(false)
 }
 
 artifacts.add(sarif.name, tasks.detekt.flatMap { it.reports.sarif.outputLocation })
