@@ -89,12 +89,15 @@ signing {
     }
 }
 
-tasks.register<Delete>("deleteDetektBaseline") {
-    delete(tasks.detekt.flatMap { it.baseline })
+detekt {
+    parallel = true
+    autoCorrect = true
+    buildUponDefaultConfig = true
+    ignoreFailures = providers.gradleProperty("ignoreDetektFailures").map { it.toBoolean() }.orElse(false)
 }
 
-tasks.detekt {
-    ignoreFailures = providers.gradleProperty("ignoreDetektFailures").map { it.toBoolean() }.orElse(false)
+tasks.register<Delete>("deleteDetektBaseline") {
+    delete(tasks.detekt.flatMap { it.baseline })
 }
 
 val sarif = configurations.consumable("sarif") {
