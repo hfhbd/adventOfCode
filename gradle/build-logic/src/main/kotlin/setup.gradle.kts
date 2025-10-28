@@ -82,11 +82,11 @@ publishing {
 }
 
 signing {
-    val signingKey = providers.gradleProperty("signingKey")
-    if (signingKey.isPresent) {
-        useInMemoryPgpKeys(signingKey.get(), providers.gradleProperty("signingPassword").get())
-        sign(publishing.publications)
-    }
+    useInMemoryPgpKeys(
+        providers.gradleProperty("signingKey").orNull,
+        providers.gradleProperty("signingPassword").orNull,
+    )
+    sign(publishing.publications)
 }
 
 detekt {
@@ -100,10 +100,11 @@ tasks.register<Delete>("deleteDetektBaseline") {
     delete(tasks.detekt.flatMap { it.baseline })
 }
 
-val sarif = configurations.consumable("sarif") {
+configurations.consumable("sarif") {
     attributes {
         attribute(Usage.USAGE_ATTRIBUTE, objects.named("detekt-sarif"))
     }
+    outgoing {
+        artifact(tasks.detekt.flatMap { it.reports.sarif.outputLocation })
+    }
 }
-
-artifacts.add(sarif.name, tasks.detekt.flatMap { it.reports.sarif.outputLocation })
