@@ -1,5 +1,5 @@
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.3.0-Beta2" }
 mavencentral = { id = "io.github.hfhbd.mavencentral", version = "0.0.23" }
-detekt = { id = "dev.detekt", version = "2.0.0-alpha.0" }
+detekt = { id = "dev.detekt", version = "2.0.0-alpha.1" }
 foojay = { id = "org.gradle.toolchains.foojay-resolver-convention", version = "1.0.0" }
