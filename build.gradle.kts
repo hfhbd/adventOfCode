@@ -8,14 +8,19 @@ tasks.closeMavenCentral {
     namespace.set("io.github.hfhbd")
 }
 
-val sarif = configurations.dependencyScope("sarif")
-dependencies {
+interface SarifDependencies : Dependencies {
+    val sarif: DependencyCollector
+}
+
+val sarifDependencies = objects.newInstance<SarifDependencies>()
+sarifDependencies.apply {
     for (subproject in subprojects) {
-        sarif(subproject)
+        sarif(dependencyFactory.create(subproject))
     }
 }
+
 val sarifFiles = configurations.resolvable("sarifFiles") {
-    extendsFrom(sarif.get())
+    fromDependencyCollector(sarifDependencies.sarif)
     attributes {
         attribute(Usage.USAGE_ATTRIBUTE, objects.named("detekt-sarif"))
     }
