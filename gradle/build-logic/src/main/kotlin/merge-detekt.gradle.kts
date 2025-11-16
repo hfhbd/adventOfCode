@@ -1,8 +1,6 @@
 import dev.detekt.gradle.report.ReportMergeTask
 
-val mergeDetekt = objects.newInstance<MergeDetektExtension>()
-
-extensions.add("mergeDetekt", mergeDetekt)
+val mergeDetekt = extensions.create("mergeDetekt", MergeDetektExtension::class)
 
 val sarifFiles = configurations.resolvable("sarifFiles") {
     fromDependencyCollector(mergeDetekt.dependencies.sarif)
