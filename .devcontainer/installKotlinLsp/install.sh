@@ -18,7 +18,7 @@ if [ -z "$VERSION" ]; then
 fi
 
 # Construct the download URL
-VSIX_URL="https://download-cdn.jetbrains.com/kotlin-lsp/${VERSION}/kotlin-${VERSION}.vsix"
+VSIX_URL="https://download-cdn.jetbrains.com/kotlin-lsp/${VERSION}/kotlin-lsp-${VERSION}-linux-x64.vsix"
 VSIX_FILE="/usr/local/share/kotlin.vsix"
 
 # Download the .vsix file using curl
