@@ -9,6 +9,11 @@ dependencies {
     implementation(libs.plugins.foojay.dep)
 }
 
+gradlePlugin.plugins.register("myRepos") {
+    id = "myRepos"
+    implementationClass = "MyReposPlugin"
+}
+
 val Provider<PluginDependency>.dep: Provider<String> get() = map { "${it.pluginId}:${it.pluginId}.gradle.plugin:${it.version}" }
 
 tasks.validatePlugins {
