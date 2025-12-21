@@ -36,7 +36,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 @BindsProjectType(SetupPlugin.Binding::class)
 abstract class SetupPlugin : Plugin<Project> {
     override fun apply(project: Project) {}
-    class Binding: ProjectTypeBinding {
+    class Binding : ProjectTypeBinding {
         override fun bind(builder: ProjectTypeBindingBuilder) {
             builder.bindProjectType("setup") { definition: SetupDefinition, _: BuildModel.NONE ->
                 project.pluginManager.apply("org.jetbrains.kotlin.jvm")
@@ -63,7 +63,8 @@ abstract class SetupPlugin : Plugin<Project> {
 
                         @InputFiles
                         @PathSensitive(PathSensitivity.RELATIVE)
-                        val kotlinClasses = project.tasks.named("compileKotlin", KotlinCompile::class).flatMap { it.destinationDirectory }
+                        val kotlinClasses = project.tasks.named("compileKotlin", KotlinCompile::class)
+                            .flatMap { it.destinationDirectory }
 
                         override fun asArguments(): List<String> = listOf(
                             "--patch-module",
@@ -163,6 +164,6 @@ abstract class SetupPlugin : Plugin<Project> {
     }
 }
 
-interface SetupDefinition: Definition<BuildModel.NONE> {
+interface SetupDefinition : Definition<BuildModel.NONE> {
     val moduleName: Property<String>
 }
