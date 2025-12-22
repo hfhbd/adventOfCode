@@ -2,7 +2,6 @@ import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.extensions.DetektExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Project.DEFAULT_VERSION
 import org.gradle.api.artifacts.repositories.PasswordCredentials
 import org.gradle.api.attributes.Usage
 import org.gradle.api.internal.plugins.BindsProjectType
@@ -13,14 +12,9 @@ import org.gradle.api.internal.plugins.ProjectTypeBindingBuilder
 import org.gradle.api.internal.plugins.features.dsl.bindProjectType
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.plugins.jvm.JvmTestSuite
-import org.gradle.api.provider.Property
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.Delete
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
-import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.kotlin.dsl.credentials
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.maven
@@ -28,17 +22,15 @@ import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.SigningExtension
-import org.gradle.process.CommandLineArgumentProvider
 import org.gradle.testing.base.TestingExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-@BindsProjectType(SetupPlugin.Binding::class)
-abstract class SetupPlugin : Plugin<Project> {
+@BindsProjectType(AdventOfCodePlugin.Binding::class)
+abstract class AdventOfCodePlugin : Plugin<Project> {
     override fun apply(project: Project) {}
     class Binding : ProjectTypeBinding {
         override fun bind(builder: ProjectTypeBindingBuilder) {
-            builder.bindProjectType("setup") { definition: SetupDefinition, _: BuildModel.NONE ->
+            builder.bindProjectType("adventOfCode") { _: SetupDefinition, _: BuildModel.NONE ->
                 project.pluginManager.apply("org.jetbrains.kotlin.jvm")
                 project.pluginManager.apply("java-test-fixtures")
                 project.pluginManager.apply("maven-publish")
@@ -57,22 +49,6 @@ abstract class SetupPlugin : Plugin<Project> {
                 val java = project.extensions["java"] as JavaPluginExtension
                 java.withSourcesJar()
 
-                project.tasks.named("compileJava", JavaCompile::class) {
-                    options.javaModuleVersion.set(project.version.toString().takeUnless { it == DEFAULT_VERSION })
-                    options.compilerArgumentProviders += object : CommandLineArgumentProvider {
-
-                        @InputFiles
-                        @PathSensitive(PathSensitivity.RELATIVE)
-                        val kotlinClasses = project.tasks.named("compileKotlin", KotlinCompile::class)
-                            .flatMap { it.destinationDirectory }
-
-                        override fun asArguments(): List<String> = listOf(
-                            "--patch-module",
-                            "${definition.moduleName.get()}=${kotlinClasses.get().asFile.absolutePath}"
-                        )
-                    }
-                }
-
                 val publishing = project.extensions[PublishingExtension.NAME] as PublishingExtension
                 publishing.apply {
                     repositories {
@@ -82,10 +58,6 @@ abstract class SetupPlugin : Plugin<Project> {
                         }
                         maven(url = "https://central.sonatype.com/repository/maven-snapshots/") {
                             name = "mavenCentralSnapshot"
-                            credentials(PasswordCredentials::class)
-                        }
-                        maven(url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/") {
-                            name = "mavenCentralStaging"
                             credentials(PasswordCredentials::class)
                         }
                     }
@@ -164,6 +136,4 @@ abstract class SetupPlugin : Plugin<Project> {
     }
 }
 
-interface SetupDefinition : Definition<BuildModel.NONE> {
-    val moduleName: Property<String>
-}
+interface SetupDefinition : Definition<BuildModel.NONE>
