@@ -3,7 +3,10 @@ import org.gradle.api.initialization.Settings
 import org.gradle.api.initialization.resolve.RepositoriesMode
 import org.gradle.api.internal.plugins.software.RegistersSoftwareTypes
 
-@RegistersSoftwareTypes(SetupPlugin::class)
+@RegistersSoftwareTypes(
+    AdventOfCodePlugin::class,
+    JPMSPlugin::class,
+)
 abstract class MyReposPlugin : Plugin<Settings> {
     override fun apply(target: Settings) {
         target.pluginManager.apply("org.gradle.toolchains.foojay-resolver-convention")
