@@ -30,7 +30,7 @@ abstract class AdventOfCodePlugin : Plugin<Project> {
     override fun apply(project: Project) {}
     class Binding : ProjectTypeBinding {
         override fun bind(builder: ProjectTypeBindingBuilder) {
-            builder.bindProjectType("adventOfCode") { _: SetupDefinition, _: BuildModel.NONE ->
+            builder.bindProjectType("adventOfCode") { _: AdventOfCodeDefinition, _: BuildModel.None ->
                 project.pluginManager.apply("org.jetbrains.kotlin.jvm")
                 project.pluginManager.apply("java-test-fixtures")
                 project.pluginManager.apply("maven-publish")
@@ -136,4 +136,4 @@ abstract class AdventOfCodePlugin : Plugin<Project> {
     }
 }
 
-interface SetupDefinition : Definition<BuildModel.NONE>
+interface AdventOfCodeDefinition : Definition<BuildModel.None>
