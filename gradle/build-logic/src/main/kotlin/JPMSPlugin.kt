@@ -21,7 +21,7 @@ abstract class JPMSPlugin: Plugin<Project> {
     override fun apply(target: Project) {}
     class Binding : ProjectFeatureBinding {
         override fun bind(builder: ProjectFeatureBindingBuilder) {
-            builder.bindProjectFeature("jpms") { moduleName: JPMSDefinition, _: JPMSBuildModel, _: SetupDefinition ->
+            builder.bindProjectFeature("jpms") { moduleName: JPMSDefinition, _: BuildModel.None, _: AdventOfCodeDefinition ->
                 project.tasks.named("compileJava", JavaCompile::class) {
                     options.javaModuleVersion.set(project.version.toString().takeUnless { it == DEFAULT_VERSION })
                     options.compilerArgumentProviders += object : CommandLineArgumentProvider {
@@ -42,9 +42,6 @@ abstract class JPMSPlugin: Plugin<Project> {
     }
 }
 
-interface JPMSDefinition : Definition<JPMSBuildModel> {
+interface JPMSDefinition : Definition<BuildModel.None> {
     val moduleName: Property<String>
 }
-
-// https://github.com/gradle/gradle/issues/35869
-interface JPMSBuildModel : BuildModel
