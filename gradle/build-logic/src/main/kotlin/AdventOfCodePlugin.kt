@@ -60,7 +60,7 @@ abstract class AdventOfCodePlugin : Plugin<Project> {
                 java.withSourcesJar()
 
                 val publishing = project.extensions[PublishingExtension.NAME] as PublishingExtension
-                val mavenPublication =  publishing.publications.register<MavenPublication>("gpr") {
+                val mavenPublication = publishing.publications.register<MavenPublication>("gpr") {
                     from(project.components["java"])
                 }
                 publishing.apply {
@@ -176,7 +176,6 @@ abstract class AdventOfCodePlugin : Plugin<Project> {
                             .flatMap { it.outputDirectory })
                     archiveClassifier.set("javadoc")
                 }
-                project.components["java"]
 
                 mavenPublication {
                     artifact(dokkaJavadocJar)
