@@ -145,17 +145,15 @@ abstract class AdventOfCodePlugin : Plugin<Project> {
                 val dokka = project.extensions.getByName("dokka") as DokkaExtension
                 dokka.apply {
                     val module = project.name
-                    dokkaSourceSets.configureEach {
+                    dokkaSourceSets.named("main") {
                         reportUndocumented.set(true)
                         includes.from("README.md")
-                        val sourceSetName = name
-                        project.file("$module/src/$sourceSetName").takeIf { it.exists() }?.let {
-                            sourceLink {
-                                localDirectory.set(project.file("src/$sourceSetName/kotlin"))
-                                remoteUrl.set(project.uri("https://github.com/hfhbd/adventOfCode/tree/main/$module/src/$sourceSetName/kotlin"))
-                                remoteLineSuffix.set("#L")
-                            }
+                        sourceLink {
+                            localDirectory.set(project.file("src/main/kotlin"))
+                            remoteUrl.set(project.uri("https://github.com/hfhbd/adventOfCode/tree/main/$module/src/main/kotlin"))
+                            remoteLineSuffix.set("#L")
                         }
+                        samples.from(project.file("src/test/kotlin"))
                     }
                 }
 
