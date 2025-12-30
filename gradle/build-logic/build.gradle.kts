@@ -7,6 +7,7 @@ dependencies {
     implementation(libs.plugins.mavencentral.dep)
     implementation(libs.plugins.detekt.dep)
     implementation(libs.plugins.foojay.dep)
+    implementation(libs.plugins.sigstore.dep)
 }
 
 gradlePlugin.plugins.register("myRepos") {

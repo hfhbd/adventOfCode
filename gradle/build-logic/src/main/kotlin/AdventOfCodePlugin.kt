@@ -37,6 +37,7 @@ abstract class AdventOfCodePlugin : Plugin<Project> {
                 project.pluginManager.apply("signing")
                 project.pluginManager.apply("io.github.hfhbd.mavencentral")
                 project.pluginManager.apply("dev.detekt")
+                project.pluginManager.apply("dev.sigstore.sign")
 
                 val kotlin = project.extensions["kotlin"] as KotlinJvmProjectExtension
                 kotlin.jvmToolchain(21)
