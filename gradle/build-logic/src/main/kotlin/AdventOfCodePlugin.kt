@@ -15,14 +15,21 @@ import org.gradle.api.plugins.jvm.JvmTestSuite
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.Delete
+import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.credentials
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.maven
 import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.getValue
+import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.registering
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.SigningExtension
 import org.gradle.testing.base.TestingExtension
+import org.jetbrains.dokka.gradle.DokkaExtension
+import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
 @BindsProjectType(AdventOfCodePlugin.Binding::class)
@@ -38,6 +45,8 @@ abstract class AdventOfCodePlugin : Plugin<Project> {
                 project.pluginManager.apply("io.github.hfhbd.mavencentral")
                 project.pluginManager.apply("dev.detekt")
                 project.pluginManager.apply("dev.sigstore.sign")
+                project.pluginManager.apply("org.jetbrains.dokka")
+                project.pluginManager.apply("org.jetbrains.dokka-javadoc")
 
                 val kotlin = project.extensions["kotlin"] as KotlinJvmProjectExtension
                 kotlin.jvmToolchain(21)
@@ -51,6 +60,9 @@ abstract class AdventOfCodePlugin : Plugin<Project> {
                 java.withSourcesJar()
 
                 val publishing = project.extensions[PublishingExtension.NAME] as PublishingExtension
+                val mavenPublication = publishing.publications.register<MavenPublication>("gpr") {
+                    from(project.components["java"])
+                }
                 publishing.apply {
                     repositories {
                         maven(url = "https://maven.pkg.github.com/hfhbd/adventOfCode") {
@@ -61,9 +73,6 @@ abstract class AdventOfCodePlugin : Plugin<Project> {
                             name = "mavenCentralSnapshot"
                             credentials(PasswordCredentials::class)
                         }
-                    }
-                    publications.register<MavenPublication>("gpr") {
-                        from(project.components["java"])
                     }
                     publications.withType<MavenPublication>().configureEach {
                         pom {
@@ -131,6 +140,45 @@ abstract class AdventOfCodePlugin : Plugin<Project> {
                         artifact(
                             project.tasks.named("detekt", Detekt::class).flatMap { it.reports.sarif.outputLocation })
                     }
+                }
+
+                val dokka = project.extensions.getByName("dokka") as DokkaExtension
+                dokka.apply {
+                    val module = project.name
+                    dokkaSourceSets.configureEach {
+                        reportUndocumented.set(true)
+                        includes.from("README.md")
+                        val sourceSetName = name
+                        project.file("$module/src/$sourceSetName").takeIf { it.exists() }?.let {
+                            sourceLink {
+                                localDirectory.set(project.file("src/$sourceSetName/kotlin"))
+                                remoteUrl.set(project.uri("https://github.com/hfhbd/adventOfCode/tree/main/$module/src/$sourceSetName/kotlin"))
+                                remoteLineSuffix.set("#L")
+                            }
+                        }
+                    }
+                }
+
+                // To generate documentation in HTML
+                val dokkaHtmlJar by project.tasks.registering(Jar::class) {
+                    description = "A HTML Documentation JAR containing Dokka HTML"
+                    from(
+                        project.tasks.named("dokkaGeneratePublicationHtml", DokkaGenerateTask::class)
+                            .flatMap { it.outputDirectory })
+                    archiveClassifier.set("html-doc")
+                }
+
+                // To generate documentation in Javadoc
+                val dokkaJavadocJar by project.tasks.registering(Jar::class) {
+                    description = "A Javadoc JAR containing Dokka Javadoc"
+                    from(
+                        project.tasks.named("dokkaGeneratePublicationJavadoc", DokkaGenerateTask::class)
+                            .flatMap { it.outputDirectory })
+                    archiveClassifier.set("javadoc")
+                }
+
+                mavenPublication {
+                    artifact(dokkaJavadocJar)
                 }
             }
         }

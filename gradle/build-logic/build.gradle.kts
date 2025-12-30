@@ -8,6 +8,7 @@ dependencies {
     implementation(libs.plugins.detekt.dep)
     implementation(libs.plugins.foojay.dep)
     implementation(libs.plugins.sigstore.dep)
+    implementation(libs.plugins.dokka.dep)
 }
 
 gradlePlugin.plugins.register("myRepos") {

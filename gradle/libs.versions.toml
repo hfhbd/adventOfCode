@@ -4,3 +4,4 @@ mavencentral = { id = "io.github.hfhbd.mavencentral", version = "0.0.23" }
 detekt = { id = "dev.detekt", version = "2.0.0-alpha.1" }
 foojay = { id = "org.gradle.toolchains.foojay-resolver-convention", version = "1.0.0" }
 sigstore = { id = "dev.sigstore.sign", version = "2.0.0" }
+dokka = { id = "org.jetbrains.dokka", version = "2.1.0" }
