@@ -6,7 +6,9 @@ import org.gradle.api.artifacts.repositories.PasswordCredentials
 import org.gradle.api.attributes.Usage
 import org.gradle.api.internal.plugins.BindsProjectType
 import org.gradle.api.internal.plugins.BuildModel
+import org.gradle.api.internal.plugins.DeclaredProjectFeatureBindingBuilder
 import org.gradle.api.internal.plugins.Definition
+import org.gradle.api.internal.plugins.ProjectFeatureApplicationContext
 import org.gradle.api.internal.plugins.ProjectTypeBinding
 import org.gradle.api.internal.plugins.ProjectTypeBindingBuilder
 import org.gradle.api.internal.plugins.features.dsl.bindProjectType
@@ -32,155 +34,161 @@ import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
-@BindsProjectType(AdventOfCodePlugin.Binding::class)
-abstract class AdventOfCodePlugin : Plugin<Project> {
-    override fun apply(project: Project) {}
-    class Binding : ProjectTypeBinding {
-        override fun bind(builder: ProjectTypeBindingBuilder) {
-            builder.bindProjectType("adventOfCode") { _: AdventOfCodeDefinition, _: BuildModel.None ->
-                project.pluginManager.apply("org.jetbrains.kotlin.jvm")
-                project.pluginManager.apply("java-test-fixtures")
-                project.pluginManager.apply("maven-publish")
-                project.pluginManager.apply("signing")
-                project.pluginManager.apply("io.github.hfhbd.mavencentral")
-                project.pluginManager.apply("dev.detekt")
-                project.pluginManager.apply("dev.sigstore.sign")
-                project.pluginManager.apply("org.jetbrains.dokka")
-                project.pluginManager.apply("org.jetbrains.dokka-javadoc")
+@BindsProjectType(AdventOfCodePlugin::class)
+abstract class AdventOfCodePlugin : Plugin<Project>, ProjectTypeBinding {
+    override fun apply(target: Project) {}
 
-                val kotlin = project.extensions["kotlin"] as KotlinJvmProjectExtension
-                kotlin.jvmToolchain(21)
+    override fun bind(builder: ProjectTypeBindingBuilder) {
+        builder.bindProjectType("adventOfCode") { _: AdventOfCodeDefinition ->
+            project.pluginManager.apply("org.jetbrains.kotlin.jvm")
+            project.pluginManager.apply("java-test-fixtures")
+            project.pluginManager.apply("maven-publish")
+            project.pluginManager.apply("signing")
+            project.pluginManager.apply("io.github.hfhbd.mavencentral")
+            project.pluginManager.apply("dev.detekt")
+            project.pluginManager.apply("dev.sigstore.sign")
+            project.pluginManager.apply("org.jetbrains.dokka")
+            project.pluginManager.apply("org.jetbrains.dokka-javadoc")
 
-                val testing = project.extensions["testing"] as TestingExtension
-                testing.suites.withType(JvmTestSuite::class).configureEach {
-                    useKotlinTest()
-                }
+            val kotlin = project.extensions["kotlin"] as KotlinJvmProjectExtension
+            kotlin.jvmToolchain(21)
 
-                val java = project.extensions["java"] as JavaPluginExtension
-                java.withSourcesJar()
+            val testing = project.extensions["testing"] as TestingExtension
+            testing.suites.withType(JvmTestSuite::class).configureEach {
+                useKotlinTest()
+            }
 
-                val publishing = project.extensions[PublishingExtension.NAME] as PublishingExtension
-                val mavenPublication = publishing.publications.register<MavenPublication>("gpr") {
-                    from(project.components["java"])
-                }
-                publishing.apply {
-                    repositories {
-                        maven(url = "https://maven.pkg.github.com/hfhbd/adventOfCode") {
-                            name = "GitHubPackages"
-                            credentials(PasswordCredentials::class)
-                        }
-                        maven(url = "https://central.sonatype.com/repository/maven-snapshots/") {
-                            name = "mavenCentralSnapshot"
-                            credentials(PasswordCredentials::class)
-                        }
+            val java = project.extensions["java"] as JavaPluginExtension
+            java.withSourcesJar()
+
+            val publishing = project.extensions[PublishingExtension.NAME] as PublishingExtension
+            val mavenPublication = publishing.publications.register<MavenPublication>("gpr") {
+                from(project.components["java"])
+            }
+            publishing.apply {
+                repositories {
+                    maven(url = "https://maven.pkg.github.com/hfhbd/adventOfCode") {
+                        name = "GitHubPackages"
+                        credentials(PasswordCredentials::class)
                     }
-                    publications.withType<MavenPublication>().configureEach {
-                        pom {
-                            name.set("hfhbd AdventOfCode")
-                            description.set("hfhbd AdventOfCode")
+                    maven(url = "https://central.sonatype.com/repository/maven-snapshots/") {
+                        name = "mavenCentralSnapshot"
+                        credentials(PasswordCredentials::class)
+                    }
+                }
+                publications.withType<MavenPublication>().configureEach {
+                    pom {
+                        name.set("hfhbd AdventOfCode")
+                        description.set("hfhbd AdventOfCode")
+                        url.set("https://github.com/hfhbd/adventOfCode")
+                        licenses {
+                            license {
+                                name.set("Apache-2.0")
+                                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                            }
+                        }
+                        developers {
+                            developer {
+                                id.set("hfhbd")
+                                name.set("Philip Wedemann")
+                                email.set("mybztg+mavencentral@icloud.com")
+                            }
+                        }
+                        scm {
+                            connection.set("scm:git://github.com/hfhbd/adventOfCode.git")
+                            developerConnection.set("scm:git://github.com/hfhbd/adventOfCode.git")
                             url.set("https://github.com/hfhbd/adventOfCode")
-                            licenses {
-                                license {
-                                    name.set("Apache-2.0")
-                                    url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                                }
-                            }
-                            developers {
-                                developer {
-                                    id.set("hfhbd")
-                                    name.set("Philip Wedemann")
-                                    email.set("mybztg+mavencentral@icloud.com")
-                                }
-                            }
-                            scm {
-                                connection.set("scm:git://github.com/hfhbd/adventOfCode.git")
-                                developerConnection.set("scm:git://github.com/hfhbd/adventOfCode.git")
-                                url.set("https://github.com/hfhbd/adventOfCode")
-                            }
+                        }
 
-                            distributionManagement {
-                                repository {
-                                    id.set("github")
-                                    name.set("GitHub hfhbd Apache Maven Packages")
-                                    url.set("https://maven.pkg.github.com/hfhbd/adventOfCode")
-                                }
+                        distributionManagement {
+                            repository {
+                                id.set("github")
+                                name.set("GitHub hfhbd Apache Maven Packages")
+                                url.set("https://maven.pkg.github.com/hfhbd/adventOfCode")
                             }
                         }
                     }
                 }
+            }
 
-                val signing = project.extensions.getByName("signing") as SigningExtension
-                signing.apply {
-                    useInMemoryPgpKeys(
-                        project.providers.gradleProperty("signingKey").orNull,
-                        project.providers.gradleProperty("signingPassword").orNull,
-                    )
-                    isRequired = project.providers.gradleProperty("signingKey").isPresent
-                    sign(publishing.publications)
+            val signing = project.extensions.getByName("signing") as SigningExtension
+            signing.apply {
+                useInMemoryPgpKeys(
+                    project.providers.gradleProperty("signingKey").orNull,
+                    project.providers.gradleProperty("signingPassword").orNull,
+                )
+                isRequired = project.providers.gradleProperty("signingKey").isPresent
+                sign(publishing.publications)
+            }
+
+            val detekt = project.extensions["detekt"] as DetektExtension
+            detekt.apply {
+                parallel.set(true)
+                autoCorrect.set(true)
+                buildUponDefaultConfig.set(true)
+                ignoreFailures.set(project.providers.gradleProperty("ignoreDetektFailures").map { it.toBoolean() }
+                    .orElse(false))
+            }
+
+            project.tasks.register<Delete>("deleteDetektBaseline") {
+                delete(project.tasks.named("detekt", Detekt::class).flatMap { it.baseline })
+            }
+
+            project.configurations.consumable("sarif") {
+                attributes {
+                    attribute(Usage.USAGE_ATTRIBUTE, named("detekt-sarif"))
                 }
-
-                val detekt = project.extensions["detekt"] as DetektExtension
-                detekt.apply {
-                    parallel.set(true)
-                    autoCorrect.set(true)
-                    buildUponDefaultConfig.set(true)
-                    ignoreFailures.set(project.providers.gradleProperty("ignoreDetektFailures").map { it.toBoolean() }
-                        .orElse(false))
+                outgoing {
+                    artifact(
+                        project.tasks.named("detekt", Detekt::class).flatMap { it.reports.sarif.outputLocation })
                 }
+            }
 
-                project.tasks.register<Delete>("deleteDetektBaseline") {
-                    delete(project.tasks.named("detekt", Detekt::class).flatMap { it.baseline })
-                }
-
-                project.configurations.consumable("sarif") {
-                    attributes {
-                        attribute(Usage.USAGE_ATTRIBUTE, named("detekt-sarif"))
+            val dokka = project.extensions.getByName("dokka") as DokkaExtension
+            dokka.apply {
+                val module = project.name
+                dokkaSourceSets.named("main") {
+                    reportUndocumented.set(true)
+                    includes.from("README.md")
+                    sourceLink {
+                        localDirectory.set(project.file("src/main/kotlin"))
+                        remoteUrl.set(project.uri("https://github.com/hfhbd/adventOfCode/tree/main/$module/src/main/kotlin"))
+                        remoteLineSuffix.set("#L")
                     }
-                    outgoing {
-                        artifact(
-                            project.tasks.named("detekt", Detekt::class).flatMap { it.reports.sarif.outputLocation })
-                    }
+                    samples.from(project.file("src/test/kotlin"))
                 }
+            }
 
-                val dokka = project.extensions.getByName("dokka") as DokkaExtension
-                dokka.apply {
-                    val module = project.name
-                    dokkaSourceSets.named("main") {
-                        reportUndocumented.set(true)
-                        includes.from("README.md")
-                        sourceLink {
-                            localDirectory.set(project.file("src/main/kotlin"))
-                            remoteUrl.set(project.uri("https://github.com/hfhbd/adventOfCode/tree/main/$module/src/main/kotlin"))
-                            remoteLineSuffix.set("#L")
-                        }
-                        samples.from(project.file("src/test/kotlin"))
-                    }
-                }
+            // To generate documentation in HTML
+            val dokkaHtmlJar by project.tasks.registering(Jar::class) {
+                description = "A HTML Documentation JAR containing Dokka HTML"
+                from(
+                    project.tasks.named("dokkaGeneratePublicationHtml", DokkaGenerateTask::class)
+                        .flatMap { it.outputDirectory })
+                archiveClassifier.set("html-doc")
+            }
 
-                // To generate documentation in HTML
-                val dokkaHtmlJar by project.tasks.registering(Jar::class) {
-                    description = "A HTML Documentation JAR containing Dokka HTML"
-                    from(
-                        project.tasks.named("dokkaGeneratePublicationHtml", DokkaGenerateTask::class)
-                            .flatMap { it.outputDirectory })
-                    archiveClassifier.set("html-doc")
-                }
+            // To generate documentation in Javadoc
+            val dokkaJavadocJar by project.tasks.registering(Jar::class) {
+                description = "A Javadoc JAR containing Dokka Javadoc"
+                from(
+                    project.tasks.named("dokkaGeneratePublicationJavadoc", DokkaGenerateTask::class)
+                        .flatMap { it.outputDirectory })
+                archiveClassifier.set("javadoc")
+            }
 
-                // To generate documentation in Javadoc
-                val dokkaJavadocJar by project.tasks.registering(Jar::class) {
-                    description = "A Javadoc JAR containing Dokka Javadoc"
-                    from(
-                        project.tasks.named("dokkaGeneratePublicationJavadoc", DokkaGenerateTask::class)
-                            .flatMap { it.outputDirectory })
-                    archiveClassifier.set("javadoc")
-                }
-
-                mavenPublication {
-                    artifact(dokkaJavadocJar)
-                }
+            mavenPublication {
+                artifact(dokkaJavadocJar)
             }
         }
     }
 }
 
 interface AdventOfCodeDefinition : Definition<BuildModel.None>
+
+// https://github.com/gradle/gradle/issues/35870
+public inline fun <reified OwnDefinition : Definition<BuildModel.None>> ProjectTypeBindingBuilder.bindProjectType(
+    name: String,
+    noinline block: ProjectFeatureApplicationContext.(OwnDefinition) -> Unit,
+): DeclaredProjectFeatureBindingBuilder<OwnDefinition, BuildModel.None> =
+    bindProjectType(name) { definition: OwnDefinition, _: BuildModel.None -> block(definition) }
