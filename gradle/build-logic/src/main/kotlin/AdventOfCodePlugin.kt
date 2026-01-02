@@ -262,6 +262,7 @@ public inline fun <reified OwnDefinition : Definition<BuildModel.None>> ProjectT
 ): DeclaredProjectFeatureBindingBuilder<OwnDefinition, BuildModel.None> =
     bindProjectType(name) { definition: OwnDefinition, _: BuildModel.None -> block(definition) }
 
+// https://github.com/gradle/gradle/issues/28043
 inline fun <reified T : Any> DomainObjectCollection<T>.getElements(project: Project): Provider<out Collection<T>> = project.provider {
     toList()
 }
