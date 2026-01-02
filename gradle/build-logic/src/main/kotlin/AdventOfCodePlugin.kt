@@ -1,7 +1,13 @@
 import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.extensions.DetektExtension
+import org.gradle.api.DomainObjectCollection
+import org.gradle.api.Incubating
+import org.gradle.api.Named
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.dsl.DependencyCollector
+import org.gradle.api.artifacts.dsl.GradleDependencies
 import org.gradle.api.artifacts.repositories.PasswordCredentials
 import org.gradle.api.attributes.Usage
 import org.gradle.api.internal.plugins.BindsProjectType
@@ -14,17 +20,21 @@ import org.gradle.api.internal.plugins.ProjectTypeBindingBuilder
 import org.gradle.api.internal.plugins.features.dsl.bindProjectType
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.plugins.jvm.JvmTestSuite
+import org.gradle.api.plugins.jvm.JvmTestSuiteTarget
+import org.gradle.api.plugins.jvm.PlatformDependencyModifiers
+import org.gradle.api.provider.Provider
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.Delete
+import org.gradle.api.tasks.Nested
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.credentials
 import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.getValue
+import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.maven
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
-import org.gradle.kotlin.dsl.getValue
-import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.registering
 import org.gradle.kotlin.dsl.withType
@@ -33,15 +43,16 @@ import org.gradle.testing.base.TestingExtension
 import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+import kotlin.collections.toList
 
 @BindsProjectType(AdventOfCodePlugin::class)
 abstract class AdventOfCodePlugin : Plugin<Project>, ProjectTypeBinding {
     override fun apply(target: Project) {}
-
     override fun bind(builder: ProjectTypeBindingBuilder) {
-        builder.bindProjectType("adventOfCode") { _: AdventOfCodeDefinition ->
+        builder.bindProjectType("adventOfCode") { definition: AdventOfCodeDefinition ->
             project.pluginManager.apply("org.jetbrains.kotlin.jvm")
             project.pluginManager.apply("java-test-fixtures")
+            project.pluginManager.apply("jvm-test-suite")
             project.pluginManager.apply("maven-publish")
             project.pluginManager.apply("signing")
             project.pluginManager.apply("io.github.hfhbd.mavencentral")
@@ -54,8 +65,33 @@ abstract class AdventOfCodePlugin : Plugin<Project>, ProjectTypeBinding {
             kotlin.jvmToolchain(21)
 
             val testing = project.extensions["testing"] as TestingExtension
-            testing.suites.withType(JvmTestSuite::class).configureEach {
-                useKotlinTest()
+            testing.suites.withType<JvmTestSuite>().all {
+                val jvmTestSuite = this
+                jvmTestSuite.useKotlinTest()
+
+                // use register instead to let Gradle manage the instance
+                definition.testing.suites.add(object : JvmDclTestSuite {
+                    override fun getTargets() = jvmTestSuite.targets as NamedDomainObjectContainer<JvmTestSuiteTarget>
+                    override val dependencies = object : JvmDclComponentDependencies {
+                        override val implementation = jvmTestSuite.dependencies.implementation
+                        override val compileOnly = jvmTestSuite.dependencies.compileOnly
+                        override val runtimeOnly = jvmTestSuite.dependencies.runtimeOnly
+                        override val annotationProcessor = jvmTestSuite.dependencies.annotationProcessor
+
+                        override fun getPlatform() = jvmTestSuite.dependencies.platform
+                        override fun getEnforcedPlatform() = jvmTestSuite.dependencies.enforcedPlatform
+
+                        override fun getDependencyFactory() = jvmTestSuite.dependencies.dependencyFactory
+
+                        override fun getDependencyConstraintFactory() =
+                            jvmTestSuite.dependencies.dependencyConstraintFactory
+
+                        override fun getProject(): Project = jvmTestSuite.dependencies.project
+                        override fun getObjectFactory() = jvmTestSuite.dependencies.objectFactory
+                    }
+
+                    override fun getName(): String = jvmTestSuite.name
+                })
             }
 
             val java = project.extensions["java"] as JavaPluginExtension
@@ -126,8 +162,11 @@ abstract class AdventOfCodePlugin : Plugin<Project>, ProjectTypeBinding {
                 parallel.set(true)
                 autoCorrect.set(true)
                 buildUponDefaultConfig.set(true)
-                ignoreFailures.set(project.providers.gradleProperty("ignoreDetektFailures").map { it.toBoolean() }
-                    .orElse(false))
+                ignoreFailures.set(
+                    project.providers.gradleProperty("ignoreDetektFailures")
+                        .map { it.toBoolean() }
+                        .orElse(false)
+                )
             }
 
             project.tasks.register<Delete>("deleteDetektBaseline") {
@@ -140,7 +179,8 @@ abstract class AdventOfCodePlugin : Plugin<Project>, ProjectTypeBinding {
                 }
                 outgoing {
                     artifact(
-                        project.tasks.named("detekt", Detekt::class).flatMap { it.reports.sarif.outputLocation })
+                        project.tasks.named("detekt", Detekt::class).flatMap { it.reports.sarif.outputLocation }
+                    )
                 }
             }
 
@@ -164,7 +204,8 @@ abstract class AdventOfCodePlugin : Plugin<Project>, ProjectTypeBinding {
                 description = "A HTML Documentation JAR containing Dokka HTML"
                 from(
                     project.tasks.named("dokkaGeneratePublicationHtml", DokkaGenerateTask::class)
-                        .flatMap { it.outputDirectory })
+                        .flatMap { it.outputDirectory }
+                )
                 archiveClassifier.set("html-doc")
             }
 
@@ -173,7 +214,8 @@ abstract class AdventOfCodePlugin : Plugin<Project>, ProjectTypeBinding {
                 description = "A Javadoc JAR containing Dokka Javadoc"
                 from(
                     project.tasks.named("dokkaGeneratePublicationJavadoc", DokkaGenerateTask::class)
-                        .flatMap { it.outputDirectory })
+                        .flatMap { it.outputDirectory }
+                )
                 archiveClassifier.set("javadoc")
             }
 
@@ -184,7 +226,34 @@ abstract class AdventOfCodePlugin : Plugin<Project>, ProjectTypeBinding {
     }
 }
 
-interface AdventOfCodeDefinition : Definition<BuildModel.None>
+interface AdventOfCodeDefinition : Definition<BuildModel.None> {
+    @get:Nested
+    val testing: DclTestingExtension
+}
+
+interface DclTestingExtension {
+    @get:Nested
+    val suites: NamedDomainObjectContainer<JvmDclTestSuite>
+}
+
+interface JvmDclTestSuite : Named {
+    // https://github.com/gradle/gradle/issues/36176
+    // fun useKotlinTest()
+
+    fun getTargets(): NamedDomainObjectContainer<JvmTestSuiteTarget>
+
+    @get:Nested
+    val dependencies: JvmDclComponentDependencies
+}
+
+// https://github.com/gradle/gradle/issues/36173
+@Incubating
+interface JvmDclComponentDependencies : PlatformDependencyModifiers, GradleDependencies {
+    val implementation: DependencyCollector
+    val compileOnly: DependencyCollector
+    val runtimeOnly: DependencyCollector
+    val annotationProcessor: DependencyCollector
+}
 
 // https://github.com/gradle/gradle/issues/35870
 public inline fun <reified OwnDefinition : Definition<BuildModel.None>> ProjectTypeBindingBuilder.bindProjectType(
@@ -192,3 +261,7 @@ public inline fun <reified OwnDefinition : Definition<BuildModel.None>> ProjectT
     noinline block: ProjectFeatureApplicationContext.(OwnDefinition) -> Unit,
 ): DeclaredProjectFeatureBindingBuilder<OwnDefinition, BuildModel.None> =
     bindProjectType(name) { definition: OwnDefinition, _: BuildModel.None -> block(definition) }
+
+inline fun <reified T : Any> DomainObjectCollection<T>.getElements(project: Project): Provider<out Collection<T>> = project.provider {
+    toList()
+}
