@@ -6,6 +6,7 @@ import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.artifacts.dsl.DependencyCollector
 import org.gradle.api.artifacts.dsl.GradleDependencies
 import org.gradle.api.artifacts.repositories.PasswordCredentials
@@ -21,6 +22,8 @@ import org.gradle.api.internal.plugins.ProjectTypeBindingBuilder
 import org.gradle.api.internal.plugins.features.dsl.bindProjectType
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.plugins.jvm.JvmTestSuite
+import org.gradle.api.plugins.jvm.JvmTestSuiteTarget
+import org.gradle.api.provider.Property
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.Delete
@@ -36,6 +39,7 @@ import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.registering
 import org.gradle.kotlin.dsl.withType
+import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.plugins.signing.SigningExtension
 import org.gradle.process.JavaForkOptions
 import org.gradle.testing.base.TestSuiteTarget
@@ -79,18 +83,27 @@ abstract class AdventOfCodePlugin : Plugin<Project>, ProjectTypeBinding {
 
                     dclJvmSuite.getTargets().all {
                         val dclTestSuiteTarget = this
+                        val action: Action<JvmTestSuiteTarget> = Action {
+                            project.tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME) {
+                                val s = dclTestSuiteTarget.testing.dependsOnCheck.flatMap {
+                                    if (it) {
+                                        testTask
+                                    } else {
+                                        project.provider { emptyList<Task>() }
+                                    }
+                                }.orElse(emptyList<Task>())
+                                dependsOn(s)
+                            }
+
+                            testTask {
+                                // JavaForkOptions uses Any/Object, that is not supported in DCL
+                                // dclTestSuiteTarget.testing.javaForkOptions.copyTo(this)
+                            }
+                        }
                         if (name == dclJvmSuite.name) {
-                            targets.named(name) {
-                                testTask {
-                                    dclTestSuiteTarget.javaForkOptions.copyTo(this)
-                                }
-                            }
+                            targets.named(name, action)
                         } else {
-                            targets.register(name) {
-                                testTask {
-                                    dclTestSuiteTarget.javaForkOptions.copyTo(this)
-                                }
-                            }
+                            targets.register(name, action)
                         }
                     }
                 }
@@ -256,9 +269,17 @@ interface JvmDclTestSuite : Named {
 interface JvmDclTestSuiteTarget : TestSuiteTarget, Named {
     // TaskProvider<Test> getTestTask(); is not supported in DCL
     @get:Nested
-    val javaForkOptions: JavaForkOptions
+    val testing: TestingSpec
 
     override fun getBinaryResultsDirectory(): DirectoryProperty
+}
+
+interface TestingSpec {
+    val dependsOnCheck: Property<Boolean>
+
+    // JavaForkOptions uses Any/Object, that is not supported in DCL
+    @get:Nested
+    val javaForkOptions: JavaForkOptions
 }
 
 // https://github.com/gradle/gradle/issues/36173

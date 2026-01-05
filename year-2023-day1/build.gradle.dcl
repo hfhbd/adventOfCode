@@ -13,12 +13,17 @@ adventOfCode {
             jvmDclTestSuite("integrationTest") {
                 targets {
                     jvmDclTestSuiteTarget("integrationTest") {
-                        javaForkOptions {
-                         //   environment("foo", "bar")
+                        testing {
+                            dependsOnCheck = true
+                            javaForkOptions {
+                                //   environment("foo", "bar")
+                            }
                         }
                     }
                     jvmDclTestSuiteTarget("integrationTestProd") {
-
+                        testing {
+                            dependsOnCheck = false
+                        }
                     }
                 }
                 dependencies {
