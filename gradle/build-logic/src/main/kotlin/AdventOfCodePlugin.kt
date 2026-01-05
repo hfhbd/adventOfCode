@@ -73,7 +73,7 @@ abstract class AdventOfCodePlugin : Plugin<Project>, ProjectTypeBinding {
                 useKotlinTest()
             }
 
-            definition.testing.suites.all {
+            definition.testing.getSuites().all {
                 val dclJvmSuite = this
                 val action: Action<JvmTestSuite> = Action {
                     dependencies.implementation.bundle(dclJvmSuite.dependencies.implementation.dependencies)
@@ -85,6 +85,7 @@ abstract class AdventOfCodePlugin : Plugin<Project>, ProjectTypeBinding {
                         val dclTestSuiteTarget = this
                         val action: Action<JvmTestSuiteTarget> = Action {
                             project.tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME) {
+                                // TaskProvider<Test> getTestTask(); is not supported in DCL, so we use this workaround for lifecycle task dependencies
                                 val s = dclTestSuiteTarget.testing.dependsOnCheck.flatMap {
                                     if (it) {
                                         testTask
@@ -251,11 +252,15 @@ interface AdventOfCodeDefinition : Definition<BuildModel.None> {
     val testing: DclTestingExtension
 }
 
+// Can't reuse TestingExtension from core-api because of DomainObjectCollection<? extends TestSuiteTarget> getTargets();
+// OUT/? extends is not (yet?) supported in DCL
 interface DclTestingExtension {
-    @get:Nested
-    val suites: NamedDomainObjectContainer<JvmDclTestSuite>
+    @Nested
+    fun getSuites(): NamedDomainObjectContainer<JvmDclTestSuite>
 }
 
+// Can't extend TestSuite from core-api because of DomainObjectCollection<? extends TestSuiteTarget> getTargets();
+// OUT/? extends is not (yet?) supported in DCL
 interface JvmDclTestSuite : Named {
     // https://github.com/gradle/gradle/issues/36176
     // fun useKotlinTest()
@@ -275,6 +280,7 @@ interface JvmDclTestSuiteTarget : TestSuiteTarget, Named {
 }
 
 interface TestingSpec {
+    // TaskProvider<Test> getTestTask(); is not supported in DCL, so we use this workaround for lifecycle task dependencies
     val dependsOnCheck: Property<Boolean>
 
     // JavaForkOptions uses Any/Object, that is not supported in DCL
