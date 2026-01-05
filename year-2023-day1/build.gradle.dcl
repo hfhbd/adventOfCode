@@ -10,6 +10,21 @@ adventOfCode {
                     implementation(project(":year-2023-day1"))
                 }
             }
+            jvmDclTestSuite("integrationTest") {
+                targets {
+                    jvmDclTestSuiteTarget("integrationTest") {
+                        javaForkOptions {
+                         //   environment("foo", "bar")
+                        }
+                    }
+                    jvmDclTestSuiteTarget("integrationTestProd") {
+
+                    }
+                }
+                dependencies {
+                    implementation(project(":year-2023-day1"))
+                }
+            }
         }
     }
 }
