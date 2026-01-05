@@ -1,15 +1,17 @@
 import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.extensions.DetektExtension
-import org.gradle.api.DomainObjectCollection
+import org.gradle.api.Action
 import org.gradle.api.Incubating
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.artifacts.dsl.DependencyCollector
 import org.gradle.api.artifacts.dsl.GradleDependencies
 import org.gradle.api.artifacts.repositories.PasswordCredentials
 import org.gradle.api.attributes.Usage
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.internal.plugins.BindsProjectType
 import org.gradle.api.internal.plugins.BuildModel
 import org.gradle.api.internal.plugins.DeclaredProjectFeatureBindingBuilder
@@ -21,8 +23,7 @@ import org.gradle.api.internal.plugins.features.dsl.bindProjectType
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.plugins.jvm.JvmTestSuite
 import org.gradle.api.plugins.jvm.JvmTestSuiteTarget
-import org.gradle.api.plugins.jvm.PlatformDependencyModifiers
-import org.gradle.api.provider.Provider
+import org.gradle.api.provider.Property
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.Delete
@@ -38,12 +39,14 @@ import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.registering
 import org.gradle.kotlin.dsl.withType
+import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.plugins.signing.SigningExtension
+import org.gradle.process.JavaForkOptions
+import org.gradle.testing.base.TestSuiteTarget
 import org.gradle.testing.base.TestingExtension
 import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import kotlin.collections.toList
 
 @BindsProjectType(AdventOfCodePlugin::class)
 abstract class AdventOfCodePlugin : Plugin<Project>, ProjectTypeBinding {
@@ -66,32 +69,49 @@ abstract class AdventOfCodePlugin : Plugin<Project>, ProjectTypeBinding {
 
             val testing = project.extensions["testing"] as TestingExtension
             testing.suites.withType<JvmTestSuite>().all {
-                val jvmTestSuite = this
-                jvmTestSuite.useKotlinTest()
+                // https://github.com/gradle/gradle/issues/36176
+                useKotlinTest()
+            }
 
-                // use register instead to let Gradle manage the instance
-                definition.testing.suites.add(object : JvmDclTestSuite {
-                    override fun getTargets() = jvmTestSuite.targets as NamedDomainObjectContainer<JvmTestSuiteTarget>
-                    override val dependencies = object : JvmDclComponentDependencies {
-                        override val implementation = jvmTestSuite.dependencies.implementation
-                        override val compileOnly = jvmTestSuite.dependencies.compileOnly
-                        override val runtimeOnly = jvmTestSuite.dependencies.runtimeOnly
-                        override val annotationProcessor = jvmTestSuite.dependencies.annotationProcessor
+            definition.testing.suites.all {
+                val dclJvmSuite = this
+                val action: Action<JvmTestSuite> = Action {
+                    dependencies.implementation.bundle(dclJvmSuite.dependencies.implementation.dependencies)
+                    dependencies.compileOnly.bundle(dclJvmSuite.dependencies.compileOnly.dependencies)
+                    dependencies.runtimeOnly.bundle(dclJvmSuite.dependencies.runtimeOnly.dependencies)
+                    dependencies.annotationProcessor.bundle(dclJvmSuite.dependencies.annotationProcessor.dependencies)
 
-                        override fun getPlatform() = jvmTestSuite.dependencies.platform
-                        override fun getEnforcedPlatform() = jvmTestSuite.dependencies.enforcedPlatform
+                    dclJvmSuite.getTargets().all {
+                        val dclTestSuiteTarget = this
+                        val action: Action<JvmTestSuiteTarget> = Action {
+                            project.tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME) {
+                                val s = dclTestSuiteTarget.testing.dependsOnCheck.flatMap {
+                                    if (it) {
+                                        testTask
+                                    } else {
+                                        project.provider { emptyList<Task>() }
+                                    }
+                                }.orElse(emptyList<Task>())
+                                dependsOn(s)
+                            }
 
-                        override fun getDependencyFactory() = jvmTestSuite.dependencies.dependencyFactory
-
-                        override fun getDependencyConstraintFactory() =
-                            jvmTestSuite.dependencies.dependencyConstraintFactory
-
-                        override fun getProject(): Project = jvmTestSuite.dependencies.project
-                        override fun getObjectFactory() = jvmTestSuite.dependencies.objectFactory
+                            testTask {
+                                // JavaForkOptions uses Any/Object, that is not supported in DCL
+                                // dclTestSuiteTarget.testing.javaForkOptions.copyTo(this)
+                            }
+                        }
+                        if (name == dclJvmSuite.name) {
+                            targets.named(name, action)
+                        } else {
+                            targets.register(name, action)
+                        }
                     }
-
-                    override fun getName(): String = jvmTestSuite.name
-                })
+                }
+                if (dclJvmSuite.name == "test") {
+                    testing.suites.named(dclJvmSuite.name, JvmTestSuite::class, action)
+                } else {
+                    testing.suites.register(dclJvmSuite.name, JvmTestSuite::class, action)
+                }
             }
 
             val java = project.extensions["java"] as JavaPluginExtension
@@ -240,15 +260,31 @@ interface JvmDclTestSuite : Named {
     // https://github.com/gradle/gradle/issues/36176
     // fun useKotlinTest()
 
-    fun getTargets(): NamedDomainObjectContainer<JvmTestSuiteTarget>
+    fun getTargets(): NamedDomainObjectContainer<JvmDclTestSuiteTarget>
 
     @get:Nested
     val dependencies: JvmDclComponentDependencies
 }
 
+interface JvmDclTestSuiteTarget : TestSuiteTarget, Named {
+    // TaskProvider<Test> getTestTask(); is not supported in DCL
+    @get:Nested
+    val testing: TestingSpec
+
+    override fun getBinaryResultsDirectory(): DirectoryProperty
+}
+
+interface TestingSpec {
+    val dependsOnCheck: Property<Boolean>
+
+    // JavaForkOptions uses Any/Object, that is not supported in DCL
+    @get:Nested
+    val javaForkOptions: JavaForkOptions
+}
+
 // https://github.com/gradle/gradle/issues/36173
 @Incubating
-interface JvmDclComponentDependencies : PlatformDependencyModifiers, GradleDependencies {
+interface JvmDclComponentDependencies : GradleDependencies {
     val implementation: DependencyCollector
     val compileOnly: DependencyCollector
     val runtimeOnly: DependencyCollector
@@ -261,8 +297,3 @@ public inline fun <reified OwnDefinition : Definition<BuildModel.None>> ProjectT
     noinline block: ProjectFeatureApplicationContext.(OwnDefinition) -> Unit,
 ): DeclaredProjectFeatureBindingBuilder<OwnDefinition, BuildModel.None> =
     bindProjectType(name) { definition: OwnDefinition, _: BuildModel.None -> block(definition) }
-
-// https://github.com/gradle/gradle/issues/28043
-inline fun <reified T : Any> DomainObjectCollection<T>.getElements(project: Project): Provider<out Collection<T>> = project.provider {
-    toList()
-}
