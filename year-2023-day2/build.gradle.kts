@@ -4,6 +4,7 @@ adventOfCode {
     }
 
     dependencies {
-        implementation(libs.csv)
+        // https://github.com/gradle/gradle/issues/36200
+        // implementation(libs.csv)
     }
 }
