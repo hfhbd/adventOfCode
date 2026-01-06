@@ -7,6 +7,7 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.artifacts.dsl.Dependencies
 import org.gradle.api.artifacts.dsl.DependencyCollector
 import org.gradle.api.artifacts.dsl.GradleDependencies
 import org.gradle.api.artifacts.repositories.PasswordCredentials
@@ -117,6 +118,10 @@ abstract class AdventOfCodePlugin : Plugin<Project>, ProjectTypeBinding {
 
             val java = project.extensions["java"] as JavaPluginExtension
             java.withSourcesJar()
+
+            project.configurations.named(java.sourceSets.getByName("main").implementationConfigurationName) {
+                fromDependencyCollector(definition.dependencies.implementation)
+            }
 
             val publishing = project.extensions[PublishingExtension.NAME] as PublishingExtension
             val mavenPublication = publishing.publications.register<MavenPublication>("gpr") {
@@ -243,13 +248,20 @@ abstract class AdventOfCodePlugin : Plugin<Project>, ProjectTypeBinding {
             mavenPublication {
                 artifact(dokkaJavadocJar)
             }
-        }
+        }.withUnsafeDefinition()
     }
 }
 
 interface AdventOfCodeDefinition : Definition<BuildModel.None> {
     @get:Nested
     val testing: DclTestingExtension
+
+    @get:Nested
+    val dependencies: AdventOfCodeDependencies
+}
+
+interface AdventOfCodeDependencies : Dependencies {
+    val implementation: DependencyCollector
 }
 
 // Can't reuse TestingExtension from core-api because of DomainObjectCollection<? extends TestSuiteTarget> getTargets();

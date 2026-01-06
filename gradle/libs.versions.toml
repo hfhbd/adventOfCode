@@ -1,3 +1,6 @@
+[libraries]
+csv = { module = "app.softwork:kotlinx-serialization-csv", version = "0.0.23" }
+
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.3.0" }
 mavencentral = { id = "io.github.hfhbd.mavencentral", version = "0.0.23" }
