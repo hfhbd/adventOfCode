@@ -3,6 +3,10 @@ adventOfCode {
         moduleName = "io.github.hfhbd.adventofcode.year2023.day1"
     }
 
+    dependencies {
+
+    }
+
     testing {
         suites {
             jvmDclTestSuite("test") {
@@ -16,7 +20,7 @@ adventOfCode {
                         testing {
                             dependsOnCheck = true
                             javaForkOptions {
-                                //   environment("foo", "bar")
+                             //   environment.put("foo", "bar")
                             }
                         }
                     }
