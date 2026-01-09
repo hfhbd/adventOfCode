@@ -29,6 +29,7 @@ import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.Nested
+import org.gradle.declarative.dsl.model.annotations.HiddenInDefinition
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.credentials
 import org.gradle.kotlin.dsl.get
@@ -256,8 +257,18 @@ interface AdventOfCodeDefinition : Definition<BuildModel.None> {
     @get:Nested
     val testing: DclTestingExtension
 
+    @HiddenInDefinition
+    fun testing(action: Action<DclTestingExtension>) {
+        action.execute(testing)
+    }
+
     @get:Nested
     val dependencies: AdventOfCodeDependencies
+
+    @HiddenInDefinition
+    fun dependencies(action: Action<AdventOfCodeDependencies>) {
+        action.execute(dependencies)
+    }
 }
 
 interface AdventOfCodeDependencies : Dependencies {
@@ -281,12 +292,22 @@ interface JvmDclTestSuite : Named {
 
     @get:Nested
     val dependencies: JvmDclComponentDependencies
+
+    @HiddenInDefinition
+    fun dependencies(action: Action<JvmDclComponentDependencies>) {
+        action.execute(dependencies)
+    }
 }
 
 interface JvmDclTestSuiteTarget : TestSuiteTarget, Named {
     // TaskProvider<Test> getTestTask(); is not supported in DCL
     @get:Nested
     val testing: TestingSpec
+
+    @HiddenInDefinition
+    fun testing(action: Action<TestingSpec>) {
+        action.execute(testing)
+    }
 
     override fun getBinaryResultsDirectory(): DirectoryProperty
 }
