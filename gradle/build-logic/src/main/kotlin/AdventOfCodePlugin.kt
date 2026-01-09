@@ -256,11 +256,6 @@ interface AdventOfCodeDefinition : Definition<BuildModel.None> {
     @get:Nested
     val testing: DclTestingExtension
 
-    @HiddenInDefinition
-    fun testing(action: Action<DclTestingExtension>) {
-        action.execute(testing)
-    }
-
     @get:Nested
     val dependencies: AdventOfCodeDependencies
 }
