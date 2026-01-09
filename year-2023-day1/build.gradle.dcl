@@ -20,7 +20,9 @@ adventOfCode {
                         testing {
                             dependsOnCheck = true
                             javaForkOptions {
-                             //   environment.put("foo", "bar")
+                                environment += mapOf(
+                                    "foo" to "bar",
+                                )
                             }
                         }
                     }

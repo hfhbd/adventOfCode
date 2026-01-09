@@ -24,6 +24,7 @@ import org.gradle.api.internal.plugins.features.dsl.bindProjectType
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.plugins.jvm.JvmTestSuite
 import org.gradle.api.plugins.jvm.JvmTestSuiteTarget
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
@@ -43,7 +44,6 @@ import org.gradle.kotlin.dsl.registering
 import org.gradle.kotlin.dsl.withType
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.plugins.signing.SigningExtension
-import org.gradle.process.JavaForkOptions
 import org.gradle.testing.base.TestSuiteTarget
 import org.gradle.testing.base.TestingExtension
 import org.jetbrains.dokka.gradle.DokkaExtension
@@ -100,7 +100,8 @@ abstract class AdventOfCodePlugin : Plugin<Project>, ProjectTypeBinding {
 
                             testTask {
                                 // JavaForkOptions uses Any/Object, that is not supported in DCL
-                                // dclTestSuiteTarget.testing.javaForkOptions.copyTo(this)
+                                // No provider api migration (yet), so there is no provider support, thus calling get
+                                environment(dclTestSuiteTarget.testing.javaForkOptions.environment.get())
                             }
                         }
                         if (name == dclJvmSuite.name) {
@@ -318,7 +319,16 @@ interface TestingSpec {
 
     // JavaForkOptions uses Any/Object, that is not supported in DCL
     @get:Nested
-    val javaForkOptions: JavaForkOptions
+    val javaForkOptions: JavaDclForkOptions
+
+    @HiddenInDefinition
+    fun javaForkOptions(action: Action<JavaDclForkOptions>) {
+        action.execute(javaForkOptions)
+    }
+}
+
+interface JavaDclForkOptions {
+    val environment: MapProperty<String, String>
 }
 
 // https://github.com/gradle/gradle/issues/36173
