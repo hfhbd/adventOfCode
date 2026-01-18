@@ -6,6 +6,7 @@ import org.gradle.api.internal.plugins.software.RegistersSoftwareTypes
 @RegistersSoftwareTypes(
     AdventOfCodePlugin::class,
     JPMSPlugin::class,
+    JvmTestSuiteFeature::class,
 )
 abstract class MyReposPlugin : Plugin<Settings> {
     override fun apply(target: Settings) {
