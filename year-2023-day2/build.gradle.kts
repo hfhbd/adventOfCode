@@ -6,8 +6,4 @@ adventOfCode {
     dependencies {
         implementation(libs.csv)
     }
-
-    testing {
-
-    }
 }
