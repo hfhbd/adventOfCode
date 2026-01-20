@@ -18,3 +18,9 @@ enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
 include(":year-2023-day1")
 include(":year-2023-day2")
 include(":year-2023-day3")
+
+defaults {
+    adventOfCode {
+        testing { }
+    }
+}
