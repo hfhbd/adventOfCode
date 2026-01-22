@@ -23,4 +23,10 @@ defaults {
     adventOfCode {
         testing { }
     }
+    foo {
+        // testing feature is only available for advendOfCode
+        testing {
+
+        }
+    }
 }

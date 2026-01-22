@@ -18,8 +18,8 @@ import org.gradle.kotlin.dsl.named
 import org.gradle.process.CommandLineArgumentProvider
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-@BindsProjectFeature(JPMSPlugin::class)
-abstract class JPMSPlugin : Plugin<Project>, ProjectFeatureBinding {
+@BindsProjectFeature(JPMSFeature::class)
+abstract class JPMSFeature : Plugin<Project>, ProjectFeatureBinding {
     override fun apply(target: Project) {}
     override fun bind(builder: ProjectFeatureBindingBuilder) {
         builder.bindProjectFeature("jpms") { moduleName: JPMSDefinition, _: AdventOfCodeDefinition ->

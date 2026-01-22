@@ -111,7 +111,7 @@ interface JvmDclTestSuite : Named {
     }
 }
 
-interface JvmDclTestSuiteTarget : TestSuiteTarget, Named {
+interface JvmDclTestSuiteTarget : Named {
     // TaskProvider<Test> getTestTask(); is not supported in DCL
     @get:Nested
     val testing: TestingSpec
@@ -121,7 +121,8 @@ interface JvmDclTestSuiteTarget : TestSuiteTarget, Named {
         action.execute(testing)
     }
 
-    override fun getBinaryResultsDirectory(): DirectoryProperty
+    // https://github.com/gradle/gradle/issues/36410
+    // override fun getBinaryResultsDirectory(): DirectoryProperty
 }
 
 interface TestingSpec {
