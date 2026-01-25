@@ -37,8 +37,8 @@ import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
-@BindsProjectType(AdventOfCodePlugin::class)
-abstract class AdventOfCodePlugin : Plugin<Project>, ProjectTypeBinding {
+@BindsProjectType(AdventOfCodeProjectType::class)
+abstract class AdventOfCodeProjectType : Plugin<Project>, ProjectTypeBinding {
     override fun apply(target: Project) {}
     override fun bind(builder: ProjectTypeBindingBuilder) {
         builder.bindProjectType("adventOfCode") { definition: AdventOfCodeDefinition ->

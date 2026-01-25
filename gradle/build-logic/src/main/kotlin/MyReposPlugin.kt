@@ -4,8 +4,9 @@ import org.gradle.api.initialization.resolve.RepositoriesMode
 import org.gradle.api.internal.plugins.software.RegistersSoftwareTypes
 
 @RegistersSoftwareTypes(
-    AdventOfCodePlugin::class,
-    JPMSPlugin::class,
+    AdventOfCodeProjectType::class,
+
+    JPMSFeature::class,
     JvmTestSuiteFeature::class,
 )
 abstract class MyReposPlugin : Plugin<Settings> {
