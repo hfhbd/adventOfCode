@@ -64,7 +64,7 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
                 useKotlinTest()
             }
 
-            definition.getSuites().all {
+            definition.all {
                 val dclJvmSuite = this
                 val action: Action<JvmTestSuite> = Action {
                     dependencies.implementation.bundle(dclJvmSuite.dependencies.implementation.dependencies)
@@ -115,10 +115,7 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
 
 // Can't reuse TestingExtension from core-api because of DomainObjectCollection<? extends TestSuiteTarget> getTargets();
 // OUT/? extends is not (yet?) supported in DCL
-interface DclTestingExtension : Definition<BuildModel.None> {
-    @Nested
-    fun getSuites(): NamedDomainObjectContainer<JvmDclTestSuite>
-}
+interface DclTestingExtension : NamedDomainObjectContainer<JvmDclTestSuite>, Definition<BuildModel.None>
 
 // Can't extend TestSuite from core-api because of DomainObjectCollection<? extends TestSuiteTarget> getTargets();
 // OUT/? extends is not (yet?) supported in DCL
