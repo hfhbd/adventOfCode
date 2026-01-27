@@ -21,3 +21,6 @@ val Provider<PluginDependency>.dep: Provider<String> get() = map { "${it.pluginI
 tasks.validatePlugins {
     enableStricterValidation.set(true)
 }
+
+interface Foo : Named
+extensions.add("foo", objects.domainObjectContainer(Foo::class))
