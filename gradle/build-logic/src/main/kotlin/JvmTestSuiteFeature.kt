@@ -7,7 +7,6 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.dsl.DependencyCollector
 import org.gradle.api.artifacts.dsl.GradleDependencies
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.internal.plugins.BindsProjectFeature
 import org.gradle.api.internal.plugins.BuildModel
 import org.gradle.api.internal.plugins.Definition
@@ -18,14 +17,12 @@ import org.gradle.api.plugins.jvm.JvmTestSuiteTarget
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Nested
-import org.gradle.declarative.dsl.model.annotations.HiddenInDefinition
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.gradle.language.base.plugins.LifecycleBasePlugin
-import org.gradle.testing.base.TestSuiteTarget
 import org.gradle.testing.base.TestingExtension
 
 @BindsProjectFeature(JvmTestSuiteFeature::class)
@@ -104,24 +101,15 @@ interface JvmDclTestSuite : Named {
 
     @get:Nested
     val dependencies: JvmDclComponentDependencies
-
-    @HiddenInDefinition
-    fun dependencies(action: Action<JvmDclComponentDependencies>) {
-        action.execute(dependencies)
-    }
 }
 
-interface JvmDclTestSuiteTarget : TestSuiteTarget, Named {
+interface JvmDclTestSuiteTarget : Named {
     // TaskProvider<Test> getTestTask(); is not supported in DCL
     @get:Nested
     val testing: TestingSpec
 
-    @HiddenInDefinition
-    fun testing(action: Action<TestingSpec>) {
-        action.execute(testing)
-    }
-
-    override fun getBinaryResultsDirectory(): DirectoryProperty
+    // https://github.com/gradle/gradle/issues/36410
+    // override fun getBinaryResultsDirectory(): DirectoryProperty
 }
 
 interface TestingSpec {
@@ -131,11 +119,6 @@ interface TestingSpec {
     // JavaForkOptions uses Any/Object, that is not supported in DCL
     @get:Nested
     val javaForkOptions: JavaDclForkOptions
-
-    @HiddenInDefinition
-    fun javaForkOptions(action: Action<JavaDclForkOptions>) {
-        action.execute(javaForkOptions)
-    }
 }
 
 interface JavaDclForkOptions {
