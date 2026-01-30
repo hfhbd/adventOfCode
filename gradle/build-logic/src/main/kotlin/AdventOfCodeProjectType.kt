@@ -1,6 +1,5 @@
 import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.extensions.DetektExtension
-import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.Dependencies
@@ -20,7 +19,6 @@ import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.Nested
-import org.gradle.declarative.dsl.model.annotations.HiddenInDefinition
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.credentials
 import org.gradle.kotlin.dsl.get
@@ -194,11 +192,6 @@ abstract class AdventOfCodeProjectType : Plugin<Project>, ProjectTypeBinding {
 interface AdventOfCodeDefinition : Definition<BuildModel.None> {
     @get:Nested
     val dependencies: AdventOfCodeDependencies
-
-    @HiddenInDefinition
-    fun dependencies(action: Action<AdventOfCodeDependencies>) {
-        action.execute(dependencies)
-    }
 }
 
 interface AdventOfCodeDependencies : Dependencies {
