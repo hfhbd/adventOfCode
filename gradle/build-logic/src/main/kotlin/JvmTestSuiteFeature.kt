@@ -93,7 +93,7 @@ interface DclTestingExtension : Definition<BuildModel.None> {
 
 // Can't extend TestSuite from core-api because of DomainObjectCollection<? extends TestSuiteTarget> getTargets();
 // OUT/? extends is not (yet?) supported in DCL
-interface JvmDclTestSuite : Named {
+interface JvmDclTestSuite : Definition<BuildModel.None>, Named {
     // https://github.com/gradle/gradle/issues/36176
     // fun useKotlinTest()
 
