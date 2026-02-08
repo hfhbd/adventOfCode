@@ -39,6 +39,8 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
             }
 
             definition.getSuites().all {
+                registerBuildModel(this)
+
                 val dclJvmSuite = this
                 val action: Action<JvmTestSuite> = Action {
                     dependencies.implementation.bundle(dclJvmSuite.dependencies.implementation.dependencies)
@@ -93,7 +95,7 @@ interface DclTestingExtension : Definition<BuildModel.None> {
 
 // Can't extend TestSuite from core-api because of DomainObjectCollection<? extends TestSuiteTarget> getTargets();
 // OUT/? extends is not (yet?) supported in DCL
-interface JvmDclTestSuite : Named {
+interface JvmDclTestSuite : Definition<BuildModel.None>, Named {
     // https://github.com/gradle/gradle/issues/36176
     // fun useKotlinTest()
 

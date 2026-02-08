@@ -8,6 +8,7 @@ import org.gradle.api.internal.plugins.software.RegistersSoftwareTypes
 
     JPMSFeature::class,
     JvmTestSuiteFeature::class,
+    FooJvmTestSuiteFeature::class,
 )
 abstract class MyReposPlugin : Plugin<Settings> {
     override fun apply(target: Settings) {
