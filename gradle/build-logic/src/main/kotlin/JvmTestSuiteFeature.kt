@@ -39,6 +39,8 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
             }
 
             definition.getSuites().all {
+                registerBuildModel(this)
+
                 val dclJvmSuite = this
                 val action: Action<JvmTestSuite> = Action {
                     dependencies.implementation.bundle(dclJvmSuite.dependencies.implementation.dependencies)
