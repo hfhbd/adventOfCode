@@ -1,9 +1,9 @@
 import org.gradle.api.Plugin
 import org.gradle.api.initialization.Settings
 import org.gradle.api.initialization.resolve.RepositoriesMode
-import org.gradle.api.internal.plugins.software.RegistersSoftwareTypes
+import org.gradle.features.annotations.RegistersProjectFeatures
 
-@RegistersSoftwareTypes(
+@RegistersProjectFeatures(
     AdventOfCodeProjectType::class,
 
     JPMSFeature::class,

@@ -1,10 +1,10 @@
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.internal.plugins.BindsProjectFeature
-import org.gradle.api.internal.plugins.BuildModel
-import org.gradle.api.internal.plugins.Definition
-import org.gradle.api.internal.plugins.ProjectFeatureBinding
-import org.gradle.api.internal.plugins.ProjectFeatureBindingBuilder
+import org.gradle.features.annotations.BindsProjectFeature
+import org.gradle.features.binding.BuildModel
+import org.gradle.features.binding.Definition
+import org.gradle.features.binding.ProjectFeatureBinding
+import org.gradle.features.binding.ProjectFeatureBindingBuilder
 
 @BindsProjectFeature(FooJvmTestSuiteFeature::class)
 abstract class FooJvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
