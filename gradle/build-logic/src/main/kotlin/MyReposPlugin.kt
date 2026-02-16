@@ -5,10 +5,12 @@ import org.gradle.features.annotations.RegistersProjectFeatures
 
 @RegistersProjectFeatures(
     AdventOfCodeProjectType::class,
+    AggregationProjectType::class,
 
     JPMSFeature::class,
     JvmTestSuiteFeature::class,
-    FooJvmTestSuiteFeature::class,
+    MergeDetektFeature::class,
+    DokkaAggregateFeature::class,
 )
 abstract class MyReposPlugin : Plugin<Settings> {
     override fun apply(target: Settings) {

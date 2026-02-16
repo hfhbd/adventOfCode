@@ -8,13 +8,6 @@ import org.gradle.api.artifacts.dsl.DependencyCollector
 import org.gradle.api.artifacts.repositories.PasswordCredentials
 import org.gradle.api.attributes.Usage
 import org.gradle.api.component.SoftwareComponentContainer
-import org.gradle.features.annotations.BindsProjectType
-import org.gradle.features.binding.BuildModel
-import org.gradle.features.binding.Definition
-import org.gradle.features.binding.ProjectFeatureApplicationContext
-import org.gradle.features.binding.ProjectTypeBinding
-import org.gradle.features.binding.ProjectTypeBindingBuilder
-import org.gradle.features.dsl.bindProjectType
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.plugins.PluginManager
 import org.gradle.api.provider.ProviderFactory
@@ -23,7 +16,14 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.TaskContainer
+import org.gradle.features.annotations.BindsProjectType
+import org.gradle.features.binding.BuildModel
+import org.gradle.features.binding.Definition
+import org.gradle.features.binding.ProjectFeatureApplicationContext
 import org.gradle.features.binding.ProjectTypeApplyAction
+import org.gradle.features.binding.ProjectTypeBinding
+import org.gradle.features.binding.ProjectTypeBindingBuilder
+import org.gradle.features.dsl.bindProjectType
 import org.gradle.features.file.ProjectFeatureLayout
 import org.gradle.features.registration.ConfigurationRegistrar
 import org.gradle.features.registration.TaskRegistrar
@@ -81,7 +81,7 @@ abstract class AdventOfCodeProjectType : Plugin<Project>, ProjectTypeBinding {
         override fun apply(
             context: ProjectFeatureApplicationContext,
             definition: AdventOfCodeDefinition,
-            buildModel: BuildModel.None
+            buildModel: BuildModel.None,
         ) {
             pluginManager.apply("org.jetbrains.kotlin.jvm")
             pluginManager.apply("java-test-fixtures")
@@ -168,11 +168,8 @@ abstract class AdventOfCodeProjectType : Plugin<Project>, ProjectTypeBinding {
                 parallel.set(true)
                 autoCorrect.set(true)
                 buildUponDefaultConfig.set(true)
-                ignoreFailures.set(
-                    providers.gradleProperty("ignoreDetektFailures")
-                        .map { it.toBoolean() }
-                        .orElse(false)
-                )
+                ignoreFailures.set(providers.gradleProperty("ignoreDetektFailures").map { it.toBoolean() }
+                    .orElse(false))
             }
 
             taskRegistrar.register("deleteDetektBaseline", Delete::class.java) {
@@ -185,8 +182,7 @@ abstract class AdventOfCodeProjectType : Plugin<Project>, ProjectTypeBinding {
                 }
                 outgoing {
                     artifact(
-                        tasks.named("detekt", Detekt::class).flatMap { it.reports.sarif.outputLocation }
-                    )
+                        tasks.named("detekt", Detekt::class).flatMap { it.reports.sarif.outputLocation })
                 }
             }
 
@@ -210,8 +206,7 @@ abstract class AdventOfCodeProjectType : Plugin<Project>, ProjectTypeBinding {
                 description = "A HTML Documentation JAR containing Dokka HTML"
                 from(
                     project.tasks.named("dokkaGeneratePublicationHtml", DokkaGenerateTask::class)
-                        .flatMap { it.outputDirectory }
-                )
+                        .flatMap { it.outputDirectory })
                 archiveClassifier.set("html-doc")
             }
 
@@ -220,8 +215,7 @@ abstract class AdventOfCodeProjectType : Plugin<Project>, ProjectTypeBinding {
                 description = "A Javadoc JAR containing Dokka Javadoc"
                 from(
                     project.tasks.named("dokkaGeneratePublicationJavadoc", DokkaGenerateTask::class)
-                        .flatMap { it.outputDirectory }
-                )
+                        .flatMap { it.outputDirectory })
                 archiveClassifier.set("javadoc")
             }
 
