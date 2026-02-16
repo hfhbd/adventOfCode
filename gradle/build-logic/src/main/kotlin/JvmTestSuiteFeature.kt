@@ -20,6 +20,8 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.TaskContainer
+import org.gradle.features.binding.ProjectFeatureApplyAction
+import org.gradle.features.dsl.bindProjectFeature
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.named
@@ -33,75 +35,78 @@ import javax.inject.Inject
 abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
     override fun apply(target: Project) {}
     override fun bind(builder: ProjectFeatureBindingBuilder) {
-        builder.bindProjectFeature("testing") { definition: DclTestingExtension, _: AdventOfCodeDefinition ->
-            with(objectFactory.newInstance(JvmTestSuiteFeatureAction::class.java)) {
-                apply(definition)
-            }
-        }.withUnsafeApplyAction()
+        builder.bindProjectFeature("testing", JvmTestSuiteFeatureAction::class)
+            .withUnsafeApplyAction()
     }
-}
 
-abstract class JvmTestSuiteFeatureAction {
-    @get:Inject
-    abstract val pluginManager: PluginManager
+    abstract class JvmTestSuiteFeatureAction :
+        ProjectFeatureApplyAction<DclTestingExtension, BuildModel.None, AdventOfCodeDefinition> {
+        @get:Inject
+        abstract val pluginManager: PluginManager
 
-    @get:Inject
-    abstract val tasks: TaskContainer
+        @get:Inject
+        abstract val tasks: TaskContainer
 
-    @get:Inject
-    abstract val project: Project
+        @get:Inject
+        abstract val project: Project
 
-    fun ProjectFeatureApplicationContext.apply(definition: DclTestingExtension) {
-        pluginManager.apply("jvm-test-suite")
+        override fun apply(
+            context: ProjectFeatureApplicationContext,
+            definition: DclTestingExtension,
+            buildModel: BuildModel.None,
+            parentDefinition: AdventOfCodeDefinition,
+        ) {
+            pluginManager.apply("jvm-test-suite")
 
-        val testing = project.extensions["testing"] as TestingExtension
-        testing.suites.withType<JvmTestSuite>().all {
-            // https://github.com/gradle/gradle/issues/36176
-            useKotlinTest()
-        }
+            val testing = project.extensions["testing"] as TestingExtension
+            testing.suites.withType<JvmTestSuite>().all {
+                // https://github.com/gradle/gradle/issues/36176
+                useKotlinTest()
+            }
 
-        definition.getSuites().all {
-            registerBuildModel(this)
+            definition.getSuites().all {
+                context.registerBuildModel(this)
 
-            val dclJvmSuite = this
-            val action: Action<JvmTestSuite> = Action {
-                dependencies.implementation.bundle(dclJvmSuite.dependencies.implementation.dependencies)
-                dependencies.compileOnly.bundle(dclJvmSuite.dependencies.compileOnly.dependencies)
-                dependencies.runtimeOnly.bundle(dclJvmSuite.dependencies.runtimeOnly.dependencies)
-                dependencies.annotationProcessor.bundle(dclJvmSuite.dependencies.annotationProcessor.dependencies)
+                val dclJvmSuite = this
+                val action: Action<JvmTestSuite> = Action {
+                    dependencies.implementation.bundle(dclJvmSuite.dependencies.implementation.dependencies)
+                    dependencies.compileOnly.bundle(dclJvmSuite.dependencies.compileOnly.dependencies)
+                    dependencies.runtimeOnly.bundle(dclJvmSuite.dependencies.runtimeOnly.dependencies)
+                    dependencies.annotationProcessor.bundle(dclJvmSuite.dependencies.annotationProcessor.dependencies)
 
-                dclJvmSuite.getTargets().all {
-                    val dclTestSuiteTarget = this
-                    val action: Action<JvmTestSuiteTarget> = Action {
-                        tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME) {
-                            // TaskProvider<Test> getTestTask(); is not supported in DCL, so we use this workaround for lifecycle task dependencies
-                            val s = dclTestSuiteTarget.testing.dependsOnCheck.flatMap {
-                                if (it) {
-                                    testTask
-                                } else {
-                                    project.provider { emptyList<Task>() }
-                                }
-                            }.orElse(emptyList<Task>())
-                            dependsOn(s)
+                    dclJvmSuite.getTargets().all {
+                        val dclTestSuiteTarget = this
+                        val action: Action<JvmTestSuiteTarget> = Action {
+                            tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME) {
+                                // TaskProvider<Test> getTestTask(); is not supported in DCL, so we use this workaround for lifecycle task dependencies
+                                val s = dclTestSuiteTarget.testing.dependsOnCheck.flatMap {
+                                    if (it) {
+                                        testTask
+                                    } else {
+                                        project.provider { emptyList<Task>() }
+                                    }
+                                }.orElse(emptyList<Task>())
+                                dependsOn(s)
+                            }
+
+                            testTask {
+                                // JavaForkOptions uses Any/Object, that is not supported in DCL
+                                // No provider api migration (yet), so there is no provider support, thus calling get
+                                environment(dclTestSuiteTarget.testing.javaForkOptions.environment.get())
+                            }
                         }
-
-                        testTask {
-                            // JavaForkOptions uses Any/Object, that is not supported in DCL
-                            // No provider api migration (yet), so there is no provider support, thus calling get
-                            environment(dclTestSuiteTarget.testing.javaForkOptions.environment.get())
+                        if (name == dclJvmSuite.name) {
+                            targets.named(name, action)
+                        } else {
+                            targets.register(name, action)
                         }
-                    }
-                    if (name == dclJvmSuite.name) {
-                        targets.named(name, action)
-                    } else {
-                        targets.register(name, action)
                     }
                 }
-            }
-            if (dclJvmSuite.name == "test") {
-                testing.suites.named(dclJvmSuite.name, JvmTestSuite::class, action)
-            } else {
-                testing.suites.register(dclJvmSuite.name, JvmTestSuite::class, action)
+                if (dclJvmSuite.name == "test") {
+                    testing.suites.named(dclJvmSuite.name, JvmTestSuite::class, action)
+                } else {
+                    testing.suites.register(dclJvmSuite.name, JvmTestSuite::class, action)
+                }
             }
         }
     }
