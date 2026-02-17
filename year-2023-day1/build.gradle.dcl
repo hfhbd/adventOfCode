@@ -13,9 +13,6 @@ adventOfCode {
                 dependencies {
                     implementation(project(":year-2023-day1"))
                 }
-                foo {
-
-                }
             }
             jvmDclTestSuite("integrationTest") {
                 targets {
