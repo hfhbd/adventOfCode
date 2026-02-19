@@ -21,6 +21,11 @@ include(":year-2023-day3")
 
 defaults {
     adventOfCode {
-        testing { }
+        testing {
+        }
+    }
+    aggregate {
+        testing {
+        }
     }
 }
