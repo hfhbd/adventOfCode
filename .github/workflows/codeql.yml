@@ -28,6 +28,7 @@ jobs:
           build-scan-publish: true
           build-scan-terms-of-use-url: 'https://gradle.com/terms-of-service'
           build-scan-terms-of-use-agree: 'yes'
+          allow-snapshot-wrappers: true
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
