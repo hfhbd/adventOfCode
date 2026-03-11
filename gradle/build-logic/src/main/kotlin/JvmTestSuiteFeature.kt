@@ -35,12 +35,13 @@ import javax.inject.Inject
 abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
     override fun apply(target: Project) {}
     override fun bind(builder: ProjectFeatureBindingBuilder) {
-        builder.bindProjectFeature("testing", JvmTestSuiteFeatureAction::class)
+        builder.bindProjectFeature("testing", JvmTestSuiteAdventOfCode::class)
+            .withUnsafeApplyAction()
+        builder.bindProjectFeature("testing", JvmTestSuiteAggregation::class)
             .withUnsafeApplyAction()
     }
 
-    abstract class JvmTestSuiteFeatureAction :
-        ProjectFeatureApplyAction<DclTestingExtension, BuildModel.None, AdventOfCodeDefinition> {
+    abstract class JvmTestSuiteFeatureAction {
         @get:Inject
         abstract val pluginManager: PluginManager
 
@@ -50,11 +51,9 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
         @get:Inject
         abstract val project: Project
 
-        override fun apply(
+        fun apply(
             context: ProjectFeatureApplicationContext,
             definition: DclTestingExtension,
-            buildModel: BuildModel.None,
-            parentDefinition: AdventOfCodeDefinition,
         ) {
             pluginManager.apply("jvm-test-suite")
 
@@ -62,9 +61,12 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
             testing.suites.withType<JvmTestSuite>().all {
                 // https://github.com/gradle/gradle/issues/36176
                 useKotlinTest()
+                if (name !in definition.suites.names) {
+                    definition.suites.create(name)
+                }
             }
 
-            definition.getSuites().all {
+            definition.suites.all {
                 context.registerBuildModel(this)
 
                 val dclJvmSuite = this
@@ -102,7 +104,7 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
                         }
                     }
                 }
-                if (dclJvmSuite.name == "test") {
+                if (dclJvmSuite.name in testing.suites.names) {
                     testing.suites.named(dclJvmSuite.name, JvmTestSuite::class, action)
                 } else {
                     testing.suites.register(dclJvmSuite.name, JvmTestSuite::class, action)
@@ -110,13 +112,34 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
             }
         }
     }
+
+    abstract class JvmTestSuiteAdventOfCode : JvmTestSuiteFeatureAction(), ProjectFeatureApplyAction<DclTestingExtension, BuildModel.None, AdventOfCodeDefinition> {
+        override fun apply(
+            context: ProjectFeatureApplicationContext,
+            definition: DclTestingExtension,
+            buildModel: BuildModel.None,
+            parentDefinition: AdventOfCodeDefinition,
+        ) {
+            apply(context, definition)
+        }
+    }
+    abstract class JvmTestSuiteAggregation : JvmTestSuiteFeatureAction(), ProjectFeatureApplyAction<DclTestingExtension, BuildModel.None, AggregationDefinition> {
+        override fun apply(
+            context: ProjectFeatureApplicationContext,
+            definition: DclTestingExtension,
+            buildModel: BuildModel.None,
+            parentDefinition: AggregationDefinition,
+        ) {
+            apply(context, definition)
+        }
+    }
 }
 
 // Can't reuse TestingExtension from core-api because of DomainObjectCollection<? extends TestSuiteTarget> getTargets();
 // OUT/? extends is not (yet?) supported in DCL
 interface DclTestingExtension : Definition<BuildModel.None> {
-    @Nested
-    fun getSuites(): NamedDomainObjectContainer<JvmDclTestSuite>
+    @get:Nested
+    val suites: NamedDomainObjectContainer<JvmDclTestSuite>
 }
 
 // Can't extend TestSuite from core-api because of DomainObjectCollection<? extends TestSuiteTarget> getTargets();
