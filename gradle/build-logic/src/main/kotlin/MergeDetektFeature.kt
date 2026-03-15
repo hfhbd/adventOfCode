@@ -26,6 +26,7 @@ abstract class MergeDetektFeature : Plugin<Project>, ProjectFeatureBinding {
         builder.bindProjectFeature("mergeDetekt", ApplyAction::class)
             // https://github.com/gradle/gradle/issues/36755
             .withUnsafeDefinition()
+            .withUnsafeApplyAction()
     }
 
     abstract class ApplyAction : ProjectFeatureApplyAction<MergeDetektDefinition, BuildModel.None, AggregationDefinition> {
