@@ -11,6 +11,8 @@ import org.gradle.features.annotations.RegistersProjectFeatures
     JvmTestSuiteFeature::class,
     MergeDetektFeature::class,
     DokkaAggregateFeature::class,
+
+    FooJvmTestSuiteFeature::class
 )
 abstract class MyReposPlugin : Plugin<Settings> {
     override fun apply(target: Settings) {
