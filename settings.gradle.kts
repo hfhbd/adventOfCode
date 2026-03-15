@@ -20,15 +20,8 @@ include(":year-2023-day2")
 include(":year-2023-day3")
 
 defaults {
-    adventOfCode {
+    aggregate {
         testing {
-            suites {
-                jvmDclTestSuite("test") {
-                    foo {
-
-                    }
-                }
-            }
         }
     }
 }
