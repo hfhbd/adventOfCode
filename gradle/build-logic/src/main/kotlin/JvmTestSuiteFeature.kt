@@ -103,7 +103,10 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
                     }
                 }
                 if (dclJvmSuite.name == "test") {
-                    testing.suites.named(dclJvmSuite.name, JvmTestSuite::class, action)
+                    project.afterEvaluate {
+                        // the Java plugin always uses `register`
+                        testing.suites.named(dclJvmSuite.name, JvmTestSuite::class, action)
+                    }
                 } else {
                     testing.suites.register(dclJvmSuite.name, JvmTestSuite::class, action)
                 }
