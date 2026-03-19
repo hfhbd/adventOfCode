@@ -172,7 +172,7 @@ abstract class AdventOfCodeProjectType : Plugin<Project>, ProjectTypeBinding {
                     .orElse(false))
             }
 
-            taskRegistrar.register("deleteDetektBaseline", Delete::class.java) {
+            taskRegistrar.register("deleteDetektBaseline", Delete::class) {
                 delete(project.tasks.named("detekt", Detekt::class).flatMap { it.baseline })
             }
 
