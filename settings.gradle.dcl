@@ -20,7 +20,9 @@ include(":year-2023-day2")
 include(":year-2023-day3")
 
 defaults {
-    adventOfCode {
+    kotlinJvmLibrary {
+        jvmToolchain = 21
+
         testing {
             suites {
                 jvmDclTestSuite("test") {

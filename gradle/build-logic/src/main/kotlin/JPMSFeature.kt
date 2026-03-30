@@ -28,7 +28,7 @@ abstract class JPMSFeature : Plugin<Project>, ProjectFeatureBinding {
             .withUnsafeApplyAction()
     }
 
-    internal interface JPMSFeatureAction : ProjectFeatureApplyAction<JPMSDefinition, BuildModel.None, AdventOfCodeDefinition> {
+    internal interface JPMSFeatureAction : ProjectFeatureApplyAction<JPMSDefinition, BuildModel.None, KotlinJvmLibraryDefinition> {
         @get:Inject
         val tasks: TaskContainer
 
@@ -36,7 +36,7 @@ abstract class JPMSFeature : Plugin<Project>, ProjectFeatureBinding {
             context: ProjectFeatureApplicationContext,
             definition: JPMSDefinition,
             buildModel: BuildModel.None,
-            parentDefinition: AdventOfCodeDefinition
+            parentDefinition: KotlinJvmLibraryDefinition,
         ) {
             tasks.named("compileJava", JavaCompile::class) {
                 options.javaModuleVersion.set(project.version.toString().takeUnless { it == DEFAULT_VERSION })
