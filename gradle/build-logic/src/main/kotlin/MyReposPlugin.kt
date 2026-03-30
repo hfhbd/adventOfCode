@@ -4,13 +4,15 @@ import org.gradle.api.initialization.resolve.RepositoriesMode
 import org.gradle.features.annotations.RegistersProjectFeatures
 
 @RegistersProjectFeatures(
-    AdventOfCodeProjectType::class,
+    KotlinJvmLibraryProjectType::class,
     AggregationProjectType::class,
 
     JPMSFeature::class,
     JvmTestSuiteFeature::class,
     MergeDetektFeature::class,
-    DokkaAggregateFeature::class,
+    DokkaFeature::class,
+    DetektFeature::class,
+    PublishToMavenCentralFeature::class,
 
     FooJvmTestSuiteFeature::class
 )
