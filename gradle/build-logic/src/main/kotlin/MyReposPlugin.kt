@@ -9,10 +9,14 @@ import org.gradle.features.annotations.RegistersProjectFeatures
 
     JPMSFeature::class,
     JvmTestSuiteFeature::class,
+
     MergeDetektFeature::class,
     DokkaFeature::class,
     DetektFeature::class,
+
+    MavenPublishFeature::class,
     PublishToMavenCentralFeature::class,
+    PublishToGitHubPackagesFeature::class,
 
     FooJvmTestSuiteFeature::class
 )
