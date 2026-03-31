@@ -40,7 +40,7 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
     }
 
     abstract class JvmTestSuiteFeatureAction :
-        ProjectFeatureApplyAction<DclTestingExtension, BuildModel.None, AdventOfCodeDefinition> {
+        ProjectFeatureApplyAction<DclTestingExtension, BuildModel.None, KotlinJvmLibraryDefinition> {
         @get:Inject
         abstract val pluginManager: PluginManager
 
@@ -54,7 +54,7 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
             context: ProjectFeatureApplicationContext,
             definition: DclTestingExtension,
             buildModel: BuildModel.None,
-            parentDefinition: AdventOfCodeDefinition,
+            parentDefinition: KotlinJvmLibraryDefinition,
         ) {
             pluginManager.apply("jvm-test-suite")
 

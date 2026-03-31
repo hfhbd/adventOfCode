@@ -17,4 +17,4 @@ abstract class FooJvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
     }
 }
 
-interface FooDefinition : Definition<BuildModel.None> {}
+interface FooDefinition : Definition<BuildModel.None>
