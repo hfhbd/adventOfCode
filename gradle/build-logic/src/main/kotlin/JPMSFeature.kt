@@ -12,33 +12,26 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
-import org.gradle.api.tasks.TaskContainer
-import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.features.binding.ProjectFeatureApplyAction
 import org.gradle.kotlin.dsl.named
 import org.gradle.process.CommandLineArgumentProvider
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import javax.inject.Inject
 
 @BindsProjectFeature(JPMSFeature::class)
 abstract class JPMSFeature : Plugin<Project>, ProjectFeatureBinding {
     override fun apply(target: Project) {}
     override fun bind(builder: ProjectFeatureBindingBuilder) {
         builder.bindProjectFeature("jpms", JPMSFeatureAction::class)
-            .withUnsafeApplyAction()
     }
 
     internal interface JPMSFeatureAction : ProjectFeatureApplyAction<JPMSDefinition, BuildModel.None, KotlinJvmLibraryDefinition> {
-        @get:Inject
-        val tasks: TaskContainer
-
         override fun apply(
             context: ProjectFeatureApplicationContext,
             definition: JPMSDefinition,
             buildModel: BuildModel.None,
             parentDefinition: KotlinJvmLibraryDefinition,
         ) {
-            tasks.named("compileJava", JavaCompile::class) {
+            context.getBuildModel(parentDefinition).compileJavaTask.configure {
                 options.javaModuleVersion.set(project.version.toString().takeUnless { it == DEFAULT_VERSION })
                 options.compilerArgumentProviders += object : CommandLineArgumentProvider {
 
