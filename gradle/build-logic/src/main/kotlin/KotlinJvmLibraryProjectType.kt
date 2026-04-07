@@ -6,7 +6,11 @@ import org.gradle.api.artifacts.dsl.DependencyCollector
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.plugins.PluginManager
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.TaskContainer
+import org.gradle.api.tasks.TaskProvider
+import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.features.annotations.BindsProjectType
 import org.gradle.features.binding.BuildModel
 import org.gradle.features.binding.Definition
@@ -26,28 +30,29 @@ abstract class KotlinJvmLibraryProjectType : Plugin<Project>, ProjectTypeBinding
     override fun bind(builder: ProjectTypeBindingBuilder) {
         builder.bindProjectType("kotlinJvmLibrary", ApplyAction::class)
             .withUnsafeDefinition()
+            .withBuildModelImplementationType(DefaultKotlinJvmLibraryBuildModel::class.java)
             .withUnsafeApplyAction()
     }
 
     internal abstract class ApplyAction : ProjectTypeApplyAction<KotlinJvmLibraryDefinition, KotlinJvmLibraryBuildModel> {
-        @get:Inject
-        abstract val pluginManager: PluginManager
+        @get:Inject abstract val pluginManager: PluginManager
 
-        @get:Inject
-        abstract val configurations: ConfigurationContainer
+        @get:Inject abstract val configurations: ConfigurationContainer
 
-        @get:Inject
-        abstract val project: Project
+        @get:Inject abstract val project: Project
+        @get:Inject abstract val tasks: TaskContainer
 
         override fun apply(
             context: ProjectFeatureApplicationContext,
             definition: KotlinJvmLibraryDefinition,
             buildModel: KotlinJvmLibraryBuildModel,
         ) {
-            buildModel.jvmToolchain.set(definition.jvmToolchain)
-
             pluginManager.apply("org.jetbrains.kotlin.jvm")
             pluginManager.apply("java-test-fixtures")
+
+            buildModel as DefaultKotlinJvmLibraryBuildModel
+            buildModel.jvmToolchain = definition.jvmToolchain
+            buildModel.compileJavaTask = tasks.named("compileJava", JavaCompile::class.java)
 
             val kotlin = project.extensions["kotlin"] as KotlinJvmProjectExtension
             kotlin.jvmToolchain {
@@ -76,5 +81,11 @@ interface AdventOfCodeDependencies : Dependencies {
 }
 
 interface KotlinJvmLibraryBuildModel : BuildModel {
-    val jvmToolchain: Property<Int>
+    val jvmToolchain: Provider<Int>
+    val compileJavaTask: TaskProvider<JavaCompile>
+}
+
+internal abstract class DefaultKotlinJvmLibraryBuildModel : KotlinJvmLibraryBuildModel {
+    override lateinit var jvmToolchain: Provider<Int>
+    override lateinit var compileJavaTask: TaskProvider<JavaCompile>
 }
