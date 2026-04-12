@@ -1,5 +1,6 @@
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.component.SoftwareComponentContainer
 import org.gradle.api.plugins.PluginManager
 import org.gradle.api.provider.Property
 import org.gradle.api.publish.PublishingExtension
@@ -37,6 +38,8 @@ abstract class MavenPublishFeature : Plugin<Project>, ProjectFeatureBinding {
         @get:Inject
         abstract val project: Project
 
+        @get:Inject abstract val components: SoftwareComponentContainer
+
         override fun apply(
             context: ProjectFeatureApplicationContext,
             definition: MavenPublishDefinition,
@@ -47,9 +50,7 @@ abstract class MavenPublishFeature : Plugin<Project>, ProjectFeatureBinding {
 
             val publishing = project.extensions[PublishingExtension.NAME] as PublishingExtension
             val mavenPublication = publishing.publications.create<MavenPublication>("gpr") {
-                project.afterEvaluate {
-                    from(components["java"])
-                }
+                from(components["java"])
             }
             (buildModel as DefaultMavenPublishBuildModel).mavenPublication = mavenPublication
             publishing.apply {
