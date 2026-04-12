@@ -9,6 +9,7 @@ import org.gradle.features.annotations.RegistersProjectFeatures
 
     JPMSFeature::class,
     JvmTestSuiteFeature::class,
+    TestFixturesFeature::class,
 
     MergeDetektFeature::class,
     DokkaFeature::class,

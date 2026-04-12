@@ -23,6 +23,10 @@ defaults {
     kotlinJvmLibrary {
         jvmToolchain = 21
 
+        testFixtures {
+
+        }
+
         testing {
             suites {
                 jvmDclTestSuite("test") {
