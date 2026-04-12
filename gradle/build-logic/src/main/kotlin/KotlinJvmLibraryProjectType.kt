@@ -1,10 +1,10 @@
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ConfigurationContainer
-import org.gradle.api.artifacts.dsl.Dependencies
 import org.gradle.api.artifacts.dsl.DependencyCollector
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.plugins.PluginManager
+import org.gradle.api.plugins.jvm.JvmComponentDependencies
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Nested
@@ -29,6 +29,7 @@ abstract class KotlinJvmLibraryProjectType : Plugin<Project>, ProjectTypeBinding
     override fun apply(target: Project) {}
     override fun bind(builder: ProjectTypeBindingBuilder) {
         builder.bindProjectType("kotlinJvmLibrary", ApplyAction::class)
+            // https://github.com/gradle/gradle/issues/36755
             .withUnsafeDefinition()
             .withBuildModelImplementationType(DefaultKotlinJvmLibraryBuildModel::class.java)
             .withUnsafeApplyAction()
@@ -48,7 +49,7 @@ abstract class KotlinJvmLibraryProjectType : Plugin<Project>, ProjectTypeBinding
             buildModel: KotlinJvmLibraryBuildModel,
         ) {
             pluginManager.apply("org.jetbrains.kotlin.jvm")
-            pluginManager.apply("java-test-fixtures")
+            pluginManager.apply("java-library")
 
             buildModel as DefaultKotlinJvmLibraryBuildModel
             buildModel.jvmToolchain = definition.jvmToolchain
@@ -62,9 +63,7 @@ abstract class KotlinJvmLibraryProjectType : Plugin<Project>, ProjectTypeBinding
             val java = project.extensions["java"] as JavaPluginExtension
             java.withSourcesJar()
 
-            configurations.named(java.sourceSets.getByName("main").implementationConfigurationName) {
-                fromDependencyCollector(definition.dependencies.implementation)
-            }
+            configurations.wire("", definition.dependencies)
         }
     }
 }
@@ -73,11 +72,7 @@ interface KotlinJvmLibraryDefinition : Definition<KotlinJvmLibraryBuildModel> {
     val jvmToolchain: Property<Int>
 
     @get:Nested
-    val dependencies: AdventOfCodeDependencies
-}
-
-interface AdventOfCodeDependencies : Dependencies {
-    val implementation: DependencyCollector
+    val dependencies: JvmLibraryDependencies
 }
 
 interface KotlinJvmLibraryBuildModel : BuildModel {

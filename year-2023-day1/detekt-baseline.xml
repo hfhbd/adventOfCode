@@ -3,7 +3,6 @@
   <ManuallySuppressedIssues/>
   <CurrentIssues>
     <ID>CyclomaticComplexMethod:getDigits2.kt:fun Sequence&lt;String>.getDigits2</ID>
-    <ID>InvalidPackageDeclaration:Day1Test.kt:package io.github.hfhbd.adventofcode.year2023.day1</ID>
     <ID>LoopWithTooManyJumpStatements:getDigits2.kt:for</ID>
     <ID>MagicNumber:getDigits.kt:10</ID>
     <ID>MagicNumber:getDigits2.kt:10</ID>

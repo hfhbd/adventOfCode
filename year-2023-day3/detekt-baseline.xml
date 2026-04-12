@@ -5,7 +5,6 @@
     <ID>ComplexCondition:getParts.kt:hasLeft || hasRight || hasUpper || hasDown</ID>
     <ID>CyclomaticComplexMethod:getParts.kt:fun getParts</ID>
     <ID>CyclomaticComplexMethod:getParts2.kt:fun getParts2</ID>
-    <ID>InvalidPackageDeclaration:Day3Test.kt:package io.github.hfhbd.adventofcode.year2023.day3</ID>
     <ID>LongMethod:getParts2.kt:fun getParts2</ID>
     <ID>LoopWithTooManyJumpStatements:getParts.kt:while</ID>
     <ID>MagicNumber:getParts2.kt:3</ID>
