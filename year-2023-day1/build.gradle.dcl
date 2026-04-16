@@ -3,15 +3,11 @@ kotlinJvmLibrary {
         moduleName = "io.github.hfhbd.adventofcode.year2023.day1"
     }
 
-    dependencies {
-
-    }
-
     testing {
         suites {
             jvmDclTestSuite("test") {
                 dependencies {
-                    implementation(project(":year-2023-day1"))
+                    implementation(project())
                 }
                 foo {
 
@@ -36,7 +32,7 @@ kotlinJvmLibrary {
                     }
                 }
                 dependencies {
-                    implementation(project(":year-2023-day1"))
+                    implementation(project())
                 }
             }
         }
