@@ -8,36 +8,32 @@ kotlinJvmLibrary {
     }
 
     testing {
-        suites {
-            jvmDclTestSuite("test") {
-                dependencies {
-                    implementation(project(":year-2023-day1"))
-                }
-                foo {
+        jvmDclTestSuite("test") {
+            dependencies {
+                implementation(project(":year-2023-day1"))
+            }
+            foo {
 
+            }
+        }
+        jvmDclTestSuite("integrationTest") {
+            targets {
+                jvmDclTestSuiteTarget("integrationTest") {
+                    testing {
+                        dependsOnCheck = true
+                        javaForkOptions {
+                            environment += mapOf("foo" to "bar")
+                        }
+                    }
+                }
+                jvmDclTestSuiteTarget("integrationTestProd") {
+                    testing {
+                        dependsOnCheck = false
+                    }
                 }
             }
-            jvmDclTestSuite("integrationTest") {
-                targets {
-                    jvmDclTestSuiteTarget("integrationTest") {
-                        testing {
-                            dependsOnCheck = true
-                            javaForkOptions {
-                                environment += mapOf(
-                                    "foo" to "bar",
-                                )
-                            }
-                        }
-                    }
-                    jvmDclTestSuiteTarget("integrationTestProd") {
-                        testing {
-                            dependsOnCheck = false
-                        }
-                    }
-                }
-                dependencies {
-                    implementation(project(":year-2023-day1"))
-                }
+            dependencies {
+                implementation(project(":year-2023-day1"))
             }
         }
     }
