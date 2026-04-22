@@ -36,6 +36,7 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
     override fun apply(target: Project) {}
     override fun bind(builder: ProjectFeatureBindingBuilder) {
         builder.bindProjectFeature("testing", JvmTestSuiteFeatureAction::class)
+            .withUnsafeDefinition()
             .withUnsafeApplyAction()
     }
 
