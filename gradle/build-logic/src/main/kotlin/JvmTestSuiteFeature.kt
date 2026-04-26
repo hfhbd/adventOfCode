@@ -19,13 +19,13 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.TaskContainer
+import org.gradle.features.binding.BuildModelRegistrar
 import org.gradle.features.binding.ProjectFeatureApplyAction
 import org.gradle.features.dsl.bindProjectFeature
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.withType
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.testing.base.TestingExtension
 import org.jetbrains.kotlin.gradle.declarative.projecttypes.jvmapplication.JvmApplicationProjectType
@@ -51,6 +51,9 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
         @get:Inject
         abstract val project: Project
 
+        @get:Inject
+        abstract val buildModelRegistrar: BuildModelRegistrar
+
         override fun apply(
             context: ProjectFeatureApplicationContext,
             definition: DclTestingExtension,
@@ -60,13 +63,15 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
             pluginManager.apply("jvm-test-suite")
 
             val testing = project.extensions["testing"] as TestingExtension
-            testing.suites.withType<JvmTestSuite>().all {
-                useKotlinTest()
-            }
 
             definition.suites.all {
+                val buildModel = buildModelRegistrar.registerBuildModel(this, DefaultJvmDclTestSuiteBuildModel::class.java)
+                buildModel as DefaultJvmDclTestSuiteBuildModel
+
                 val dclJvmSuite = this
                 val action: Action<JvmTestSuite> = Action {
+                    buildModel.testSuite = this
+
                     dependencies.implementation.bundle(dclJvmSuite.dependencies.implementation.dependencies)
                     dependencies.compileOnly.bundle(dclJvmSuite.dependencies.compileOnly.dependencies)
                     dependencies.runtimeOnly.bundle(dclJvmSuite.dependencies.runtimeOnly.dependencies)
@@ -121,11 +126,20 @@ interface DclTestingExtension : Definition<BuildModel.None> {
 
 // Can't extend TestSuite from core-api because of DomainObjectCollection<? extends TestSuiteTarget> getTargets();
 // OUT/? extends is not (yet?) supported in DCL
-interface JvmDclTestSuite : Definition<BuildModel.None>, Named {
+interface JvmDclTestSuite : Definition<JvmDclTestSuiteBuildModel>, Named {
+    @get:Nested
     val targets: NamedDomainObjectContainer<JvmDclTestSuiteTarget>
 
     @get:Nested
     val dependencies: JvmDclComponentDependencies
+}
+
+interface JvmDclTestSuiteBuildModel : BuildModel {
+    val testSuite: JvmTestSuite
+}
+
+internal abstract class DefaultJvmDclTestSuiteBuildModel : JvmDclTestSuiteBuildModel {
+    override lateinit var testSuite: JvmTestSuite
 }
 
 interface JvmDclTestSuiteTarget : Named {

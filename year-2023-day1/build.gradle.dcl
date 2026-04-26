@@ -13,7 +13,7 @@ jvmApplication {
                 dependencies {
                     implementation(project())
                 }
-                foo {
+                useKotlinTest {
 
                 }
             }
