@@ -1,8 +1,9 @@
 [libraries]
 csv = { module = "app.softwork:kotlinx-serialization-csv", version = "0.0.23" }
 
+kotlin-ecosystem = { module = "org.jetbrains.ecosystem:ecosystem-plugin", version = "0.71.0" }
+
 [plugins]
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.3.21" }
 mavencentral = { id = "io.github.hfhbd.mavencentral", version = "0.0.23" }
 detekt = { id = "dev.detekt", version = "2.0.0-alpha.3" }
 foojay = { id = "org.gradle.toolchains.foojay-resolver-convention", version = "1.0.0" }
