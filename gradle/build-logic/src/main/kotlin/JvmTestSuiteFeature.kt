@@ -65,7 +65,7 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
                 useKotlinTest()
             }
 
-            definition.getSuites().all {
+            definition.suites.all {
                 val dclJvmSuite = this
                 val action: Action<JvmTestSuite> = Action {
                     dependencies.implementation.bundle(dclJvmSuite.dependencies.implementation.dependencies)
@@ -73,7 +73,7 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
                     dependencies.runtimeOnly.bundle(dclJvmSuite.dependencies.runtimeOnly.dependencies)
                     dependencies.annotationProcessor.bundle(dclJvmSuite.dependencies.annotationProcessor.dependencies)
 
-                    dclJvmSuite.getTargets().all {
+                    dclJvmSuite.targets.all {
                         val dclTestSuiteTarget = this
                         val action: Action<JvmTestSuiteTarget> = Action {
                             tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME) {
@@ -117,8 +117,8 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
 // Can't reuse TestingExtension from core-api because of DomainObjectCollection<? extends TestSuiteTarget> getTargets();
 // OUT/? extends is not (yet?) supported in DCL
 interface DclTestingExtension : Definition<BuildModel.None> {
-    @Nested
-    fun getSuites(): NamedDomainObjectContainer<JvmDclTestSuite>
+    @get:Nested
+    val suites: NamedDomainObjectContainer<JvmDclTestSuite>
 }
 
 // Can't extend TestSuite from core-api because of DomainObjectCollection<? extends TestSuiteTarget> getTargets();
@@ -127,7 +127,8 @@ interface JvmDclTestSuite : Definition<BuildModel.None>, Named {
     // https://github.com/gradle/gradle/issues/36176
     // fun useKotlinTest()
 
-    fun getTargets(): NamedDomainObjectContainer<JvmDclTestSuiteTarget>
+    @get:Nested
+    val targets: NamedDomainObjectContainer<JvmDclTestSuiteTarget>
 
     @get:Nested
     val dependencies: JvmDclComponentDependencies
