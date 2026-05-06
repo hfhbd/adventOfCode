@@ -11,7 +11,7 @@ jvmApplication {
         suites {
             jvmDclTestSuite("test") {
                 dependencies {
-                    implementation(project(":year-2023-day1"))
+                    implementation(project())
                 }
                 foo {
 

@@ -1,8 +1,12 @@
 import org.gradle.api.artifacts.ConfigurationContainer
+import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.dsl.DependencyCollector
 import org.gradle.api.plugins.jvm.JvmComponentDependencies
 
 interface JvmLibraryDependencies : JvmComponentDependencies {
+    // https://github.com/gradle/gradle/issues/37508
+    override fun project(): ProjectDependency = super.project()
+
     /**
      * Returns a [org.gradle.api.artifacts.dsl.DependencyCollector] that collects the set of api dependencies.
      *

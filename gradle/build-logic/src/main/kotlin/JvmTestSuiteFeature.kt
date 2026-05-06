@@ -1,13 +1,12 @@
 import org.gradle.api.Action
-import org.gradle.api.Incubating
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.artifacts.dsl.DependencyCollector
-import org.gradle.api.artifacts.dsl.GradleDependencies
+import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.plugins.PluginManager
+import org.gradle.api.plugins.jvm.JvmComponentDependencies
 import org.gradle.features.annotations.BindsProjectFeature
 import org.gradle.features.binding.BuildModel
 import org.gradle.features.binding.Definition
@@ -62,7 +61,6 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
 
             val testing = project.extensions["testing"] as TestingExtension
             testing.suites.withType<JvmTestSuite>().all {
-                // https://github.com/gradle/gradle/issues/36176
                 useKotlinTest()
             }
 
@@ -125,9 +123,6 @@ interface DclTestingExtension : Definition<BuildModel.None> {
 // Can't extend TestSuite from core-api because of DomainObjectCollection<? extends TestSuiteTarget> getTargets();
 // OUT/? extends is not (yet?) supported in DCL
 interface JvmDclTestSuite : Definition<BuildModel.None>, Named {
-    // https://github.com/gradle/gradle/issues/36176
-    // fun useKotlinTest()
-
     fun getTargets(): NamedDomainObjectContainer<JvmDclTestSuiteTarget>
 
     @get:Nested
@@ -135,7 +130,6 @@ interface JvmDclTestSuite : Definition<BuildModel.None>, Named {
 }
 
 interface JvmDclTestSuiteTarget : Named {
-    // TaskProvider<Test> getTestTask(); is not supported in DCL
     @get:Nested
     val testing: TestingSpec
 
@@ -144,7 +138,6 @@ interface JvmDclTestSuiteTarget : Named {
 }
 
 interface TestingSpec {
-    // TaskProvider<Test> getTestTask(); is not supported in DCL, so we use this workaround for lifecycle task dependencies
     val dependsOnCheck: Property<Boolean>
 
     // JavaForkOptions uses Any/Object, that is not supported in DCL
@@ -156,11 +149,7 @@ interface JavaDclForkOptions {
     val environment: MapProperty<String, String>
 }
 
-// https://github.com/gradle/gradle/issues/36173
-@Incubating
-interface JvmDclComponentDependencies : GradleDependencies {
-    val implementation: DependencyCollector
-    val compileOnly: DependencyCollector
-    val runtimeOnly: DependencyCollector
-    val annotationProcessor: DependencyCollector
+interface JvmDclComponentDependencies : JvmComponentDependencies {
+    // https://github.com/gradle/gradle/issues/37508
+    override fun project(): ProjectDependency = super.project()
 }
