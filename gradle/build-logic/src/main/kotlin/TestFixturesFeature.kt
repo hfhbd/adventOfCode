@@ -26,14 +26,14 @@ abstract class TestFixturesFeature : Plugin<Project>, ProjectFeatureBinding {
     abstract class ApplyAction @Inject constructor(
         private val pluginManager: PluginManager,
         private val configurations: ConfigurationContainer,
-    ) : ProjectFeatureApplyAction<TestFixturesDefinition, BuildModel.None, KotlinJvmLibraryDefinition> {
+    ) : ProjectFeatureApplyAction<TestFixturesDefinition, BuildModel.None, org.jetbrains.kotlin.gradle.declarative.projecttypes.jvmapplication.JvmApplicationProjectType> {
 
 
         override fun apply(
             context: ProjectFeatureApplicationContext,
             definition: TestFixturesDefinition,
             buildModel: BuildModel.None,
-            parentDefinition: KotlinJvmLibraryDefinition,
+            parentDefinition: org.jetbrains.kotlin.gradle.declarative.projecttypes.jvmapplication.JvmApplicationProjectType,
         ) {
             pluginManager.apply("java-test-fixtures")
             configurations.wire("testFixtures", definition.dependencies)

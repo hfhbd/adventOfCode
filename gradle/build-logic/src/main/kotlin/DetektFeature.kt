@@ -20,6 +20,7 @@ import org.gradle.features.registration.TaskRegistrar
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
 import javax.inject.Inject
+import org.jetbrains.kotlin.gradle.declarative.projecttypes.jvmapplication.JvmApplicationProjectType
 
 @BindsProjectFeature(DetektFeature::class)
 abstract class DetektFeature : Plugin<Project>, ProjectFeatureBinding {
@@ -29,7 +30,7 @@ abstract class DetektFeature : Plugin<Project>, ProjectFeatureBinding {
             .withUnsafeApplyAction()
     }
 
-    internal abstract class ApplyAction : ProjectFeatureApplyAction<DetektDefinition, BuildModel.None, KotlinJvmLibraryDefinition> {
+    internal abstract class ApplyAction : ProjectFeatureApplyAction<DetektDefinition, BuildModel.None, JvmApplicationProjectType> {
         @get:Inject
         abstract val pluginManager: PluginManager
 
@@ -52,7 +53,7 @@ abstract class DetektFeature : Plugin<Project>, ProjectFeatureBinding {
             context: ProjectFeatureApplicationContext,
             definition: DetektDefinition,
             buildModel: BuildModel.None,
-            parentDefinition: KotlinJvmLibraryDefinition,
+            parentDefinition: JvmApplicationProjectType,
         ) {
             pluginManager.apply("dev.detekt")
             val detekt = project.extensions["detekt"] as DetektExtension

@@ -28,19 +28,20 @@ import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.testing.base.TestingExtension
+import org.jetbrains.kotlin.gradle.declarative.projecttypes.jvmapplication.JvmApplicationProjectType
 import javax.inject.Inject
 
 @BindsProjectFeature(JvmTestSuiteFeature::class)
 abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
     override fun apply(target: Project) {}
     override fun bind(builder: ProjectFeatureBindingBuilder) {
-        builder.bindProjectFeature("testing", JvmTestSuiteFeatureAction::class)
+        builder.bindProjectFeature("testSuites", JvmTestSuiteFeatureAction::class)
             .withUnsafeDefinition()
             .withUnsafeApplyAction()
     }
 
     abstract class JvmTestSuiteFeatureAction :
-        ProjectFeatureApplyAction<DclTestingExtension, BuildModel.None, KotlinJvmLibraryDefinition> {
+        ProjectFeatureApplyAction<DclTestingExtension, BuildModel.None, JvmApplicationProjectType> {
         @get:Inject
         abstract val pluginManager: PluginManager
 
@@ -54,7 +55,7 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
             context: ProjectFeatureApplicationContext,
             definition: DclTestingExtension,
             buildModel: BuildModel.None,
-            parentDefinition: KotlinJvmLibraryDefinition,
+            parentDefinition: JvmApplicationProjectType,
         ) {
             pluginManager.apply("jvm-test-suite")
 

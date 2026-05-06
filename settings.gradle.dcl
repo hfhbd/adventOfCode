@@ -3,11 +3,15 @@ pluginManagement {
     repositories {
         mavenCentral()
         gradlePluginPortal()
+        maven {
+            url = uri("https://raw.githubusercontent.com/Kotlin/declarative-gradle-jetbrains-ecosystem-plugin/refs/heads/maven2")
+        }
     }
 }
 
 plugins {
     id("myRepos")
+    id("org.jetbrains.ecosystem").version("0.73.0")
 }
 
 rootProject.name = "adventOfCode"
@@ -20,14 +24,18 @@ include(":year-2023-day2")
 include(":year-2023-day3")
 
 defaults {
-    kotlinJvmLibrary {
-        jvmToolchain = 21
+    jvmApplication {
+     kotlin {
+         compilerOptions {
+             jvmTarget = JVM_21
+         }
+     }
 
         testFixtures {
 
         }
 
-        testing {
+        testSuites {
             suites {
                 jvmDclTestSuite("test") {
                     foo {
