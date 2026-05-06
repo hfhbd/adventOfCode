@@ -4,7 +4,6 @@ import org.gradle.api.initialization.resolve.RepositoriesMode
 import org.gradle.features.annotations.RegistersProjectFeatures
 
 @RegistersProjectFeatures(
-    KotlinJvmLibraryProjectType::class,
     AggregationProjectType::class,
 
     JPMSFeature::class,

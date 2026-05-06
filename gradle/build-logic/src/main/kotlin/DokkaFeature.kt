@@ -28,6 +28,7 @@ import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
 import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
+import org.jetbrains.kotlin.gradle.declarative.projecttypes.jvmapplication.JvmApplicationProjectType
 import javax.inject.Inject
 
 @BindsProjectFeature(DokkaFeature::class)
@@ -73,7 +74,7 @@ abstract class DokkaFeature : Plugin<Project>, ProjectFeatureBinding {
     }
 
 
-    internal abstract class ApplyToKotlinJvmLibrary : ProjectFeatureApplyAction<DokkaDefinition, BuildModel.None, KotlinJvmLibraryDefinition> {
+    internal abstract class ApplyToKotlinJvmLibrary : ProjectFeatureApplyAction<DokkaDefinition, BuildModel.None, JvmApplicationProjectType> {
         @get:Inject
         abstract val pluginManager: PluginManager
 
@@ -84,7 +85,7 @@ abstract class DokkaFeature : Plugin<Project>, ProjectFeatureBinding {
             context: ProjectFeatureApplicationContext,
             definition: DokkaDefinition,
             buildModel: BuildModel.None,
-            parentDefinition: KotlinJvmLibraryDefinition,
+            parentDefinition: JvmApplicationProjectType,
         ) {
             pluginManager.apply("org.jetbrains.dokka")
 

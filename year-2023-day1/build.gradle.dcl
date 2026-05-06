@@ -1,4 +1,4 @@
-kotlinJvmLibrary {
+jvmApplication {
     jpms {
         moduleName = "io.github.hfhbd.adventofcode.year2023.day1"
     }
@@ -7,7 +7,7 @@ kotlinJvmLibrary {
 
     }
 
-    testing {
+    testSuites {
         suites {
             jvmDclTestSuite("test") {
                 dependencies {

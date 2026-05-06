@@ -20,6 +20,7 @@ import org.gradle.features.dsl.bindProjectFeature
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.declarative.projecttypes.jvmapplication.JvmApplicationProjectType
 import javax.inject.Inject
 
 @BindsProjectFeature(MavenPublishFeature::class)
@@ -31,7 +32,7 @@ abstract class MavenPublishFeature : Plugin<Project>, ProjectFeatureBinding {
             .withUnsafeApplyAction()
     }
 
-    internal abstract class ApplyAction : ProjectFeatureApplyAction<MavenPublishDefinition, MavenPublishBuildModel, KotlinJvmLibraryDefinition> {
+    internal abstract class ApplyAction : ProjectFeatureApplyAction<MavenPublishDefinition, MavenPublishBuildModel, JvmApplicationProjectType> {
         @get:Inject
         abstract val pluginManager: PluginManager
 
@@ -44,7 +45,7 @@ abstract class MavenPublishFeature : Plugin<Project>, ProjectFeatureBinding {
             context: ProjectFeatureApplicationContext,
             definition: MavenPublishDefinition,
             buildModel: MavenPublishBuildModel,
-            parentDefinition: KotlinJvmLibraryDefinition,
+            parentDefinition: JvmApplicationProjectType,
         ) {
             pluginManager.apply("maven-publish")
 

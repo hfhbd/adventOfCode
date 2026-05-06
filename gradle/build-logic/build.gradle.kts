@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.kotlin.ecosystem)
+    implementation(libs.plugins.kotlin.ecosystem.dep)
     implementation(libs.plugins.mavencentral.dep)
     implementation(libs.plugins.detekt.dep)
     implementation(libs.plugins.foojay.dep)
