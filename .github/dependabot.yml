@@ -1,4 +1,10 @@
 version: 2
+registries:
+  kotlin-ecosystem:
+    type: maven-repository
+    url: https://maven.pkg.github.com/Kotlin/declarative-gradle-jetbrains-ecosystem-plugin
+    username: dependabot
+    password: ${{ secrets.GITHUB_TOKEN }}
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -9,8 +15,4 @@ updates:
     schedule:
       interval: "daily"
     registries:
-      kotlin-ecosystem:
-        type: maven-repository
-        url: https://maven.pkg.github.com/Kotlin/declarative-gradle-jetbrains-ecosystem-plugin
-        username: dependabot
-        password: ${{secrets.GITHUB_TOKEN}}
+      - kotlin-ecosystem
