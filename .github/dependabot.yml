@@ -12,3 +12,5 @@ updates:
       kotlin-ecosystem:
         type: maven-repository
         url: https://maven.pkg.github.com/Kotlin/declarative-gradle-jetbrains-ecosystem-plugin
+        username: dependabot
+        password: ${{ secrets.GITHUB_TOKEN }}
