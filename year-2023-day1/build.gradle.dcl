@@ -9,7 +9,7 @@ jvmApplication {
 
     testSuites {
         suites {
-            jvmDclTestSuite("test") {
+            jvmTestSuite("test") {
                 dependencies {
                     implementation(project())
                 }
@@ -17,9 +17,13 @@ jvmApplication {
 
                 }
             }
-            jvmDclTestSuite("integrationTest") {
+            jvmTestSuite("integrationTest") {
+                useKotlinTest {
+
+                }
+
                 targets {
-                    jvmDclTestSuiteTarget("integrationTest") {
+                    jvmTestSuiteTarget("integrationTest") {
                         testing {
                             dependsOnCheck = true
                             javaForkOptions {
@@ -29,7 +33,7 @@ jvmApplication {
                             }
                         }
                     }
-                    jvmDclTestSuiteTarget("integrationTestProd") {
+                    jvmTestSuiteTarget("integrationTestProd") {
                         testing {
                             dependsOnCheck = false
                         }

@@ -7,25 +7,26 @@ import org.gradle.api.Task
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.plugins.PluginManager
 import org.gradle.api.plugins.jvm.JvmComponentDependencies
-import org.gradle.features.annotations.BindsProjectFeature
-import org.gradle.features.binding.BuildModel
-import org.gradle.features.binding.Definition
-import org.gradle.features.binding.ProjectFeatureApplicationContext
-import org.gradle.features.binding.ProjectFeatureBinding
-import org.gradle.features.binding.ProjectFeatureBindingBuilder
 import org.gradle.api.plugins.jvm.JvmTestSuite
 import org.gradle.api.plugins.jvm.JvmTestSuiteTarget
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.TaskContainer
+import org.gradle.declarative.dsl.model.annotations.ElementFactoryName
+import org.gradle.features.annotations.BindsProjectFeature
+import org.gradle.features.binding.BuildModel
 import org.gradle.features.binding.BuildModelRegistrar
+import org.gradle.features.binding.Definition
+import org.gradle.features.binding.ProjectFeatureApplicationContext
 import org.gradle.features.binding.ProjectFeatureApplyAction
+import org.gradle.features.binding.ProjectFeatureBinding
+import org.gradle.features.binding.ProjectFeatureBindingBuilder
 import org.gradle.features.dsl.bindProjectFeature
+import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.getByName
 import org.gradle.kotlin.dsl.invoke
-import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.register
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.testing.base.TestingExtension
 import org.jetbrains.kotlin.gradle.declarative.projecttypes.jvmapplication.JvmApplicationProjectType
@@ -38,6 +39,10 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
         builder.bindProjectFeature("testSuites", JvmTestSuiteFeatureAction::class)
             .withUnsafeDefinition()
             .withUnsafeApplyAction()
+            .withNestedBuildModelImplementationType(
+                JvmDclTestSuiteBuildModel::class.java,
+                DefaultJvmDclTestSuiteBuildModel::class.java
+            )
     }
 
     abstract class JvmTestSuiteFeatureAction :
@@ -65,13 +70,12 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
             val testing = project.extensions["testing"] as TestingExtension
 
             definition.suites.all {
-                val buildModel = buildModelRegistrar.registerBuildModel(this, DefaultJvmDclTestSuiteBuildModel::class.java)
+                val buildModel =
+                    buildModelRegistrar.registerBuildModel(this, DefaultJvmDclTestSuiteBuildModel::class.java)
                 buildModel as DefaultJvmDclTestSuiteBuildModel
 
                 val dclJvmSuite = this
                 val action: Action<JvmTestSuite> = Action {
-                    buildModel.testSuite = this
-
                     dependencies.implementation.bundle(dclJvmSuite.dependencies.implementation.dependencies)
                     dependencies.compileOnly.bundle(dclJvmSuite.dependencies.compileOnly.dependencies)
                     dependencies.runtimeOnly.bundle(dclJvmSuite.dependencies.runtimeOnly.dependencies)
@@ -105,13 +109,13 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
                         }
                     }
                 }
-                if (dclJvmSuite.name == "test") {
-                    project.afterEvaluate {
-                        // the Java plugin always uses `register`
-                        testing.suites.named(dclJvmSuite.name, JvmTestSuite::class, action)
+                buildModel.testSuite = if (dclJvmSuite.name == "test") {
+                    // the Java plugin always uses `register`
+                    testing.suites.getByName(dclJvmSuite.name, JvmTestSuite::class).apply {
+                        action.execute(this)
                     }
                 } else {
-                    testing.suites.register(dclJvmSuite.name, JvmTestSuite::class, action)
+                    testing.suites.create(dclJvmSuite.name, JvmTestSuite::class, action)
                 }
             }
         }
@@ -126,6 +130,7 @@ interface DclTestingExtension : Definition<BuildModel.None> {
 
 // Can't extend TestSuite from core-api because of DomainObjectCollection<? extends TestSuiteTarget> getTargets();
 // OUT/? extends is not (yet?) supported in DCL
+@ElementFactoryName("jvmTestSuite")
 interface JvmDclTestSuite : Definition<JvmDclTestSuiteBuildModel>, Named {
     @get:Nested
     val targets: NamedDomainObjectContainer<JvmDclTestSuiteTarget>
@@ -142,6 +147,7 @@ internal abstract class DefaultJvmDclTestSuiteBuildModel : JvmDclTestSuiteBuildM
     override lateinit var testSuite: JvmTestSuite
 }
 
+@ElementFactoryName("jvmTestSuiteTarget")
 interface JvmDclTestSuiteTarget : Named {
     @get:Nested
     val testing: TestingSpec
