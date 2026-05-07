@@ -8,3 +8,7 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    registries:
+      kotlin-ecosystem:
+        type: maven-repository
+        url: https://maven.pkg.github.com/Kotlin/declarative-gradle-jetbrains-ecosystem-plugin
