@@ -1,5 +1,7 @@
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.provider.Property
+import org.gradle.api.testing.toolchains.internal.KotlinTestTestToolchain
 import org.gradle.features.annotations.BindsProjectFeature
 import org.gradle.features.binding.BuildModel
 import org.gradle.features.binding.Definition
@@ -12,10 +14,14 @@ abstract class KotlinTestJvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBi
     override fun apply(target: Project) {}
 
     override fun bind(builder: ProjectFeatureBindingBuilder) {
-        builder.bindProjectFeature("useKotlinTest") { _: UseKotlinTestDefinition, _: BuildModel.None, jvmDclTestSuite: JvmDclTestSuite ->
-            getBuildModel(jvmDclTestSuite).testSuite.useKotlinTest()
+        builder.bindProjectFeature("useKotlinTest") { definition: UseKotlinTestDefinition, _: BuildModel.None, jvmDclTestSuite: JvmDclTestSuite ->
+            getBuildModel(jvmDclTestSuite).testSuite.useKotlinTest(
+                definition.version.orElse(KotlinTestTestToolchain.DEFAULT_VERSION)
+            )
         }
     }
 }
 
-interface UseKotlinTestDefinition : Definition<BuildModel.None>
+interface UseKotlinTestDefinition : Definition<BuildModel.None> {
+    val version: Property<String>
+}
