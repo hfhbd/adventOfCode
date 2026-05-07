@@ -18,7 +18,7 @@ import org.gradle.features.annotations.RegistersProjectFeatures
     PublishToMavenCentralFeature::class,
     PublishToGitHubPackagesFeature::class,
 
-    FooJvmTestSuiteFeature::class
+    KotlinTestJvmTestSuiteFeature::class
 )
 abstract class MyReposPlugin : Plugin<Settings> {
     override fun apply(target: Settings) {

@@ -37,8 +37,8 @@ defaults {
 
         testSuites {
             suites {
-                jvmDclTestSuite("test") {
-                    foo {
+                jvmTestSuite("test") {
+                    useKotlinTest {
 
                     }
                 }
