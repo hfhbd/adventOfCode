@@ -19,7 +19,7 @@ jvmApplication {
             }
             jvmTestSuite("integrationTest") {
                 useKotlinTest {
-
+                    version = "2.4.0-Beta2"
                 }
 
                 targets {
@@ -27,9 +27,7 @@ jvmApplication {
                         testing {
                             dependsOnCheck = true
                             javaForkOptions {
-                                environment += mapOf(
-                                    "foo" to "bar",
-                                )
+                                environment += mapOf("foo" to "bar")
                             }
                         }
                     }
