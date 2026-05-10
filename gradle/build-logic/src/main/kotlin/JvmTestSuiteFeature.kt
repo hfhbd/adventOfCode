@@ -16,7 +16,6 @@ import org.gradle.api.tasks.TaskContainer
 import org.gradle.declarative.dsl.model.annotations.ElementFactoryName
 import org.gradle.features.annotations.BindsProjectFeature
 import org.gradle.features.binding.BuildModel
-import org.gradle.features.binding.BuildModelRegistrar
 import org.gradle.features.binding.Definition
 import org.gradle.features.binding.ProjectFeatureApplicationContext
 import org.gradle.features.binding.ProjectFeatureApplyAction
@@ -42,6 +41,9 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
             .withNestedBuildModelImplementationType(
                 JvmDclTestSuiteBuildModel::class.java,
                 DefaultJvmDclTestSuiteBuildModel::class.java
+            ).withNestedBuildModelImplementationType(
+                JvmDclTestSuiteTargetBuildModel::class.java,
+                DefaultJvmDclTestSuiteTargetBuildModel::class.java
             )
     }
 
@@ -56,9 +58,6 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
         @get:Inject
         abstract val project: Project
 
-        @get:Inject
-        abstract val buildModelRegistrar: BuildModelRegistrar
-
         override fun apply(
             context: ProjectFeatureApplicationContext,
             definition: DclTestingExtension,
@@ -70,8 +69,7 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
             val testing = project.extensions["testing"] as TestingExtension
 
             definition.suites.all {
-                val buildModel =
-                    buildModelRegistrar.registerBuildModel(this, DefaultJvmDclTestSuiteBuildModel::class.java)
+                val buildModel = context.getBuildModel(this)
                 buildModel as DefaultJvmDclTestSuiteBuildModel
 
                 val dclJvmSuite = this
@@ -83,6 +81,9 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
 
                     dclJvmSuite.targets.all {
                         val dclTestSuiteTarget = this
+                        val buildModel = context.getBuildModel(this)
+                        buildModel as DefaultJvmDclTestSuiteTargetBuildModel
+
                         val action: Action<JvmTestSuiteTarget> = Action {
                             tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME) {
                                 // TaskProvider<Test> getTestTask(); is not supported in DCL, so we use this workaround for lifecycle task dependencies
@@ -102,10 +103,10 @@ abstract class JvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBinding {
                                 environment(dclTestSuiteTarget.testing.javaForkOptions.environment.get())
                             }
                         }
-                        if (name == dclJvmSuite.name) {
-                            targets.named(name, action)
+                        buildModel.target = if (name == dclJvmSuite.name) {
+                            targets.getByName(name, action)
                         } else {
-                            targets.register(name, action)
+                            targets.create(name, action)
                         }
                     }
                 }
@@ -148,12 +149,20 @@ internal abstract class DefaultJvmDclTestSuiteBuildModel : JvmDclTestSuiteBuildM
 }
 
 @ElementFactoryName("jvmTestSuiteTarget")
-interface JvmDclTestSuiteTarget : Named {
+interface JvmDclTestSuiteTarget : Named, Definition<JvmDclTestSuiteTargetBuildModel> {
     @get:Nested
     val testing: TestingSpec
 
     // https://github.com/gradle/gradle/issues/36410
     // override fun getBinaryResultsDirectory(): DirectoryProperty
+}
+
+interface JvmDclTestSuiteTargetBuildModel : BuildModel {
+    val target: JvmTestSuiteTarget
+}
+
+internal abstract class DefaultJvmDclTestSuiteTargetBuildModel : JvmDclTestSuiteTargetBuildModel {
+    override lateinit var target: JvmTestSuiteTarget
 }
 
 interface TestingSpec {
