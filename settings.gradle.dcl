@@ -32,7 +32,9 @@ defaults {
      }
 
         testFixtures {
-
+            dependencies {
+                api(project(":year-2023-day1"))
+            }
         }
 
         testSuites {
