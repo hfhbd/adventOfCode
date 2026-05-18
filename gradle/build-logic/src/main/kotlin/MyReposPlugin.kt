@@ -23,6 +23,7 @@ import org.gradle.features.annotations.RegistersProjectFeatures
 abstract class MyReposPlugin : Plugin<Settings> {
     override fun apply(target: Settings) {
         target.pluginManager.apply("org.gradle.toolchains.foojay-resolver-convention")
+        target.pluginManager.apply("org.jetbrains.ecosystem")
 
         target.dependencyResolutionManagement {
             repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)

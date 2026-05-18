@@ -11,7 +11,6 @@ pluginManagement {
 
 plugins {
     id("myRepos")
-    id("org.jetbrains.ecosystem").version("0.73.0")
 }
 
 rootProject.name = "adventOfCode"
