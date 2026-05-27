@@ -137,7 +137,7 @@ interface JvmDclTestSuite : Definition<JvmDclTestSuiteBuildModel>, Named {
     val targets: NamedDomainObjectContainer<JvmDclTestSuiteTarget>
 
     @get:Nested
-    val dependencies: JvmDclComponentDependencies
+    val dependencies: JvmComponentDependencies
 }
 
 interface JvmDclTestSuiteBuildModel : BuildModel {
@@ -175,9 +175,4 @@ interface TestingSpec {
 
 interface JavaDclForkOptions {
     val environment: MapProperty<String, String>
-}
-
-interface JvmDclComponentDependencies : JvmComponentDependencies {
-    // https://github.com/gradle/gradle/issues/37508
-    override fun project(): ProjectDependency = super.project()
 }

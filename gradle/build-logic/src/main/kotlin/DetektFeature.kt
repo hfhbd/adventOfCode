@@ -66,7 +66,7 @@ abstract class DetektFeature : Plugin<Project>, ProjectFeatureBinding {
             }
 
             taskRegistrar.register("deleteDetektBaseline", Delete::class.java) {
-                delete(project.tasks.named("detekt", Detekt::class).flatMap { it.baseline })
+                delete(tasks.named("detekt", Detekt::class).flatMap { it.baseline })
             }
 
             configurationRegistrar.consumable("sarif") {
