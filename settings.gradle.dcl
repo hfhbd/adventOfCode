@@ -24,11 +24,11 @@ include(":year-2023-day3")
 
 defaults {
     jvmApplication {
-     kotlin {
-         compilerOptions {
-             jvmTarget = JVM_21
-         }
-     }
+        kotlin {
+            compilerOptions {
+                jvmTarget = JVM_21
+            }
+        }
 
         testFixtures {
 
