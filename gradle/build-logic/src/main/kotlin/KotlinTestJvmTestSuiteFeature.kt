@@ -26,9 +26,9 @@ abstract class KotlinTestJvmTestSuiteFeature : Plugin<Project>, ProjectFeatureBi
             buildModel: BuildModel.None,
             parentDefinition: JvmDclTestSuite
         ) {
-            context.getBuildModel(parentDefinition).testSuite.useKotlinTest(
-                definition.version.orElse(KotlinTestTestToolchain.DEFAULT_VERSION)
-            )
+            val parentBuildModel = context.getBuildModel(parentDefinition)
+            val kotlinVersion = definition.version.orElse(KotlinTestTestToolchain.DEFAULT_VERSION)
+            parentBuildModel.testSuite.useKotlinTest(kotlinVersion)
         }
     }
 }
