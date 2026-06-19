@@ -26,7 +26,7 @@ jobs:
           allow-snapshot-wrappers: true
 
       - name: Build with Gradle
-        run: ./gradlew build --rerun-tasks
+        run: ./gradlew build
 
       - name: Detekt
         run: ./gradlew :mergeDetektSarif
