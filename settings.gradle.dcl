@@ -74,6 +74,7 @@ defaults {
                     name = "Philip Wedemann"
                     email = "mybztg+mavencentral@icloud.com"
                 }
+
                 scm {
                     connection = "scm:git://github.com/hfhbd/adventOfCode.git"
                     developerConnection = "scm:git://github.com/hfhbd/adventOfCode.git"
