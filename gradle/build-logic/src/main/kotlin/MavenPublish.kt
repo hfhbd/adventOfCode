@@ -8,6 +8,7 @@ import org.gradle.api.publish.maven.MavenPomLicense
 import org.gradle.api.publish.maven.MavenPomScm
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.MavenPomDeploymentRepository
+import org.gradle.api.publish.maven.MavenPomIssueManagement
 import org.gradle.api.tasks.Nested
 import org.gradle.features.annotations.BindsProjectFeature
 import org.gradle.features.binding.BuildModel
@@ -110,6 +111,9 @@ interface MavenDclPom {
 
     @get:Nested
     val scm: MavenPomScm
+
+    @get:Nested
+    val issueManagement: MavenPomIssueManagement
 
     @get:Nested
     val distributionManagement: MavenDclPomDistributionManagement
