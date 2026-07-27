@@ -32,7 +32,7 @@ abstract class JPMSFeature : Plugin<Project>, ProjectFeatureBinding {
     internal interface JPMSFeatureAction :
         ProjectFeatureApplyAction<JPMSDefinition, BuildModel.None, JvmApplicationProjectType> {
         @get:Inject
-        abstract val tasks: TaskContainer
+        val tasks: TaskContainer
 
         override fun apply(
             context: ProjectFeatureApplicationContext,
