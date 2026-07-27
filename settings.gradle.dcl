@@ -80,6 +80,9 @@ defaults {
                     developerConnection = "scm:git://github.com/hfhbd/adventOfCode.git"
                     url = "https://github.com/hfhbd/adventOfCode"
                 }
+                issueManagement {
+                    url = "https://github.com/hfhbd/adventOfCode/issues"
+                }
 
                 distributionManagement {
                     repository {
