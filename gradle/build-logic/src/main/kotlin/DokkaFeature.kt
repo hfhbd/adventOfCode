@@ -13,6 +13,7 @@ import org.gradle.api.plugins.PluginManager
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Nested
+import org.gradle.declarative.dsl.model.annotations.ElementFactoryName
 import org.gradle.features.annotations.BindsProjectFeature
 import org.gradle.features.binding.BuildModel
 import org.gradle.features.binding.Definition
@@ -153,10 +154,12 @@ interface DokkaDefinition : Definition<BuildModel.None> {
     val sourceSets: NamedDomainObjectContainer<DclDokkaSourceSet>
 }
 
+@ElementFactoryName("dokkaPublication")
 interface DclDokkaPublication {
     val includes: ListProperty<RegularFile>
 }
 
+@ElementFactoryName("dokkaSourceSet")
 interface DclDokkaSourceSet : Named {
     val reportUndocumented: Property<Boolean>
     val includes: ListProperty<RegularFile>
